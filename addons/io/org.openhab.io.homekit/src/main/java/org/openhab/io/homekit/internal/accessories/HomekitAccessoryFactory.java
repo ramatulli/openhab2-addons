@@ -15,7 +15,6 @@ package org.openhab.io.homekit.internal.accessories;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.Item;
@@ -78,9 +77,6 @@ public class HomekitAccessoryFactory {
                 return new HomekitHumiditySensorImpl(taggedItem, itemRegistry, updater);
             case CONTACT_SENSOR:
                 return new HomekitContactSensorImpl(taggedItem, itemRegistry, updater);
-            case BLINDS:
-            case WINDOW_COVERING:
-                return new HomekitWindowCoveringImpl(taggedItem, itemRegistry, updater);
         }
 
         throw new IllegalArgumentException("Unknown homekit type: " + taggedItem.getAccessoryType());
