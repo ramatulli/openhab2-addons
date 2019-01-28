@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="monoprice10761"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="zone">
+		<supported-bridge-type-refs>
+			<bridge-type-ref id="amp" />
+		</supported-bridge-type-refs>
+
+		<label>Monoprice 10761 Multizone Amp Zone</label>
+		<description>Represents a single speaker zone.</description>
+
+		<channels>
+			<channel id="power" typeId="system.power" />
+			<channel id="source" typeId="source">
+				<label>Active Source Input</label>
+				<description>Active source input (1-6)</description>
+			</channel>
+			<channel id="volume" typeId="system.volume" />
+			<channel id="mute" typeId="system.mute" />
+			<channel id="dnd" typeId="dnd">
+				<label>Do Not Disturb</label>
+				<description>Do Not Disturb mode (ignores PA trigger)</description>
+			</channel>
+			<channel id="treble" typeId="audio_param">
+				<label>Treble</label>
+				<description>Treble boost (0-14)</description>
+			</channel>
+			<channel id="bass" typeId="audio_param">
+				<label>Base</label>
+				<description>Bass boost (0-14)</description>
+			</channel>
+			<channel id="balance" typeId="balance">
+				<label>Balance</label>
+				<description>Balance (0-20; 10 is centered, 0 is full left, 20 is full right).</description>
+			</channel>
+			<channel id="keypad" typeId="status">
+				<label>Keypad</label>
+				<description>Keypad connected status</description>
+			</channel>
+			<channel id="pa" typeId="status">
+				<label>PA</label>
+				<description>PA status</description>
+			</channel>
+		</channels>
+
+		<config-description>
+			<parameter name="zoneNumber" type="integer" required="true" min="1" max="64">
+				<label>Zone Number</label>
+				<description>First digit is unit number, second digit is zone number. So 11-16, 21-26, 31-36.</description>
+			</parameter>
+		</config-description>
+
+	</thing-type>
+
+	<channel-type id="source">
+		<item-type>Number</item-type>
+		<label>Input Source</label>
+		<description>Input source (1-6)</description>
+		<state min="1" max="6"></state>
+	</channel-type>
+
+	<channel-type id="dnd">
+		<item-type>Switch</item-type>
+		<label>Do Not Disturb</label>
+		<description>Do Not Disturb mode (ignores PA trigger)</description>
+	</channel-type>
+
+	<channel-type id="audio_param">
+		<item-type>Number</item-type>
+		<label>Treble/Bass Boost</label>
+		<description>Treble/Bass Boost (0-14)</description>
+		<state min="0" max="14"></state>
+	</channel-type>
+
+	<channel-type id="balance">
+		<item-type>Number</item-type>
+		<label>Balance</label>
+		<description>Balance (0-20; 10 is centered, 0 is full left, 20 is full right).</description>
+		<state min="0" max="20"></state>
+	</channel-type>
+
+	<channel-type id="status">
+		<item-type>Switch</item-type>
+		<label>Status</label>
+		<description>Status (On/Off)</description>
+		<state readOnly="true"></state>
+	</channel-type>
+</thing:thing-descriptions>
