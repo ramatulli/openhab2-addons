@@ -136,6 +136,7 @@
     <module>org.openhab.binding.milight</module>
     <module>org.openhab.binding.minecraft</module>
     <module>org.openhab.binding.modbus</module>
+    <module>org.openhab.binding.monoprice10761</module>
     <module>org.openhab.binding.mqtt</module>
     <module>org.openhab.binding.mqtt.generic</module>
     <module>org.openhab.binding.mqtt.homeassistant</module>
@@ -290,7 +291,7 @@
   </dependencies>
 
   <properties>
-    <dep.noembedding></dep.noembedding>
+    <dep.noembedding/>
   </properties>
 
   <build>
