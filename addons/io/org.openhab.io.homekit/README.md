@@ -94,6 +94,7 @@ A full list of supported accessory types can be found in the table below.
 | WindowCovering        |                                   | Rollershutter             | Simple window covering with support for setting target position / current position support. |
 | SmokeSensor           |                                   | Switch, ContactSensor     | Smoke detector. ON / OPEN state means smokes detected. |
 | CarbonMonoxideSensor  |                                   | Switch, ContactSensor     | CO detector. ON / OPEN state means smoke detected (it currently appears that Home.app on iOS doesn't distinguish between a smoke and CO detector). |
+| Fan                   |                                   | Switch, Dimmer            | Fan with or without speed control. |
 
 
 See the sample below for example items:
@@ -114,6 +115,9 @@ Switch Bathroom_OccupancySensor "Bathroom Occupancy Sensor" [ "OccupancySensor" 
 Switch MasterBath_Toilet_LeakSensor "Master Bath Toilet Flood" ["LeakSensor"]
 Switch WaterMain_Valve "Water Main Valve" ["Valve"]
 Rollershutter MasterWindow_Blinds "Master Window Blinds" [ "WindowCovering" ]
+
+Dimmer FamilyRoomFan "Family Room Fan" <fan> [ "Fan" ]
+Switch BathroomFan "Bathroom Fan" <fan> [ "Fan" ]
 ```
 
 ## Common Problems
