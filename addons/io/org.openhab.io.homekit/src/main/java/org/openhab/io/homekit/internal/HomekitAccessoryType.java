@@ -36,6 +36,8 @@ public enum HomekitAccessoryType {
     MOTION_SENSOR("MotionSensor"),
     OCCUPANCY_SENSOR("OccupancySensor"),
     WINDOW_COVERING("WindowCovering"),
+    SMOKE_SENSOR("SmokeSensor"),
+    CARBON_MONOXIDE_SENSOR("CarbonMonoxideSensor"),
     @Deprecated()
     BLINDS("Blinds");
 
