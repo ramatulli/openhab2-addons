@@ -14,7 +14,6 @@ package org.openhab.io.homekit.internal.accessories;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.smarthome.core.items.GenericItem;
 import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
@@ -23,7 +22,6 @@ import org.openhab.io.homekit.internal.HomekitTaggedItem;
 import org.openhab.io.homekit.internal.battery.BatteryStatus;
 
 import com.beowulfe.hap.HomekitCharacteristicChangeCallback;
-import com.beowulfe.hap.accessories.BatteryStatusAccessory;
 import com.beowulfe.hap.accessories.ContactSensor;
 import com.beowulfe.hap.accessories.properties.ContactState;
 
@@ -31,16 +29,14 @@ import com.beowulfe.hap.accessories.properties.ContactState;
  *
  * @author Tim Harper - Initial contribution
  */
-public class HomekitContactSensorImpl extends AbstractHomekitAccessoryImpl<GenericItem>
-        implements ContactSensor, BatteryStatusAccessory {
-    private BatteryStatus batteryStatus;
+public class HomekitContactSensorImpl extends AbstractHomekitSensorImpl implements ContactSensor {
     private BooleanItemReader contactSensedReader;
 
     public HomekitContactSensorImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
             HomekitAccessoryUpdater updater, BatteryStatus batteryStatus) {
-        super(taggedItem, itemRegistry, updater, GenericItem.class);
+        super(taggedItem, itemRegistry, updater, batteryStatus);
+
         this.contactSensedReader = new BooleanItemReader(taggedItem.getItem(), OnOffType.OFF, OpenClosedType.CLOSED);
-        this.batteryStatus = batteryStatus;
     }
 
     @Override
@@ -65,20 +61,5 @@ public class HomekitContactSensorImpl extends AbstractHomekitAccessoryImpl<Gener
     @Override
     public void unsubscribeContactState() {
         getUpdater().unsubscribe(getItem());
-    }
-
-    @Override
-    public CompletableFuture<Boolean> getLowBatteryState() {
-        return CompletableFuture.completedFuture(batteryStatus.isLow());
-    }
-
-    @Override
-    public void subscribeLowBatteryState(HomekitCharacteristicChangeCallback callback) {
-        batteryStatus.subscribe(getUpdater(), callback);
-    }
-
-    @Override
-    public void unsubscribeLowBatteryState() {
-        batteryStatus.unsubscribe(getUpdater());
     }
 }

@@ -38,6 +38,7 @@ public interface BatteryStatus {
 
     public void unsubscribe(HomekitAccessoryUpdater updater);
 
+    @Nullable
     static BatteryStatus getFromCharacteristics(Map<HomekitCharacteristicType, Item> characteristicItems) {
         if (characteristicItems.containsKey(HomekitCharacteristicType.BATTERY_LEVEL)) {
             return new BatteryLevelStatus(
@@ -46,7 +47,7 @@ public interface BatteryStatus {
             return new BatteryLowStatus(
                     (SwitchItem) characteristicItems.get(HomekitCharacteristicType.BATTERY_LOW_STATUS));
         } else {
-            return new NoBatteryStatus();
+            return null;
         }
     }
 }
