@@ -17,6 +17,7 @@ import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.openhab.io.homekit.internal.HomekitAccessoryUpdater;
 import org.openhab.io.homekit.internal.HomekitTaggedItem;
 import org.openhab.io.homekit.internal.battery.BatteryStatus;
+import org.openhab.io.homekit.internal.battery.NoBatteryStatus;
 
 import com.beowulfe.hap.HomekitCharacteristicChangeCallback;
 import com.beowulfe.hap.accessories.BatteryStatusAccessory;
@@ -61,6 +62,11 @@ public class HomekitContactSensorImpl extends AbstractHomekitAccessoryImpl<Gener
     @Override
     public void unsubscribeContactState() {
         getUpdater().unsubscribe(getItem());
+    }
+
+    @Override
+    public boolean supportsBatteryStatus() {
+        return !(batteryStatus instanceof NoBatteryStatus);
     }
 
     @Override
