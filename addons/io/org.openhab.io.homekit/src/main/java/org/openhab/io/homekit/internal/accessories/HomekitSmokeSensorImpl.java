@@ -14,8 +14,6 @@ package org.openhab.io.homekit.internal.accessories;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.eclipse.jdt.annotation.NonNull;
-import org.eclipse.smarthome.core.items.GenericItem;
 import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
@@ -24,7 +22,6 @@ import org.openhab.io.homekit.internal.HomekitTaggedItem;
 import org.openhab.io.homekit.internal.battery.BatteryStatus;
 
 import com.beowulfe.hap.HomekitCharacteristicChangeCallback;
-import com.beowulfe.hap.accessories.BatteryStatusAccessory;
 import com.beowulfe.hap.accessories.SmokeSensor;
 import com.beowulfe.hap.accessories.properties.SmokeDetectedState;
 
@@ -32,20 +29,14 @@ import com.beowulfe.hap.accessories.properties.SmokeDetectedState;
  *
  * @author Cody Cutrer - Initial contribution
  */
-public class HomekitSmokeSensorImpl extends AbstractHomekitAccessoryImpl<GenericItem>
-        implements SmokeSensor, BatteryStatusAccessory {
-
-    @NonNull
-    private BatteryStatus batteryStatus;
-
+public class HomekitSmokeSensorImpl extends AbstractHomekitSensorImpl implements SmokeSensor {
     private BooleanItemReader smokeDetectedReader;
 
     public HomekitSmokeSensorImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
             HomekitAccessoryUpdater updater, BatteryStatus batteryStatus) {
-        super(taggedItem, itemRegistry, updater, GenericItem.class);
+        super(taggedItem, itemRegistry, updater, batteryStatus);
 
         this.smokeDetectedReader = new BooleanItemReader(taggedItem.getItem(), OnOffType.ON, OpenClosedType.OPEN);
-        this.batteryStatus = batteryStatus;
     }
 
     @Override
@@ -65,29 +56,5 @@ public class HomekitSmokeSensorImpl extends AbstractHomekitAccessoryImpl<Generic
     @Override
     public void unsubscribeSmokeDetectedState() {
         getUpdater().unsubscribe(getItem());
-    }
-
-    @Override
-    public CompletableFuture<Boolean> getLowBatteryState() {
-        return CompletableFuture.completedFuture(batteryStatus.isLow());
-    }
-
-    @Override
-    public void subscribeLowBatteryState(HomekitCharacteristicChangeCallback callback) {
-        batteryStatus.subscribe(getUpdater(), callback);
-    }
-
-    @Override
-    public void unsubscribeLowBatteryState() {
-        batteryStatus.unsubscribe(getUpdater());
-    }
-
-    static HomekitLeakSensorImpl createForTaggedItem(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater) {
-
-        if (taggedItem.isMemberOfAccessoryGroup()) {
-
-        }
-        return null;
     }
 }
