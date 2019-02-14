@@ -87,12 +87,6 @@ public class HomekitAccessoryFactory {
             case LIGHTBULB:
                 return new HomekitLightbulbImpl(taggedItem, itemRegistry, updater);
 
-            case DIMMABLE_LIGHTBULB:
-                return new HomekitDimmableLightbulbImpl(taggedItem, itemRegistry, updater);
-
-            case COLORFUL_LIGHTBULB:
-                return new HomekitColorfulLightbulbImpl(taggedItem, itemRegistry, updater);
-
             case THERMOSTAT:
                 HomekitTaggedItem temperatureAccessory = getPrimaryAccessory(taggedItem,
                         HomekitAccessoryType.TEMPERATURE_SENSOR, itemRegistry)
