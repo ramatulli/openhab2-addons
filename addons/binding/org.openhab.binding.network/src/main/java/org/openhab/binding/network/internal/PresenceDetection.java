@@ -153,7 +153,7 @@ public class PresenceDetection implements IPRequestReceivedCallback {
      * does not work on this system, JAVA_PING will be used instead.
      *
      * @param useSystemPing Set to true to use a system ping method, false to use java ping and null to disable ICMP
-     *            pings.
+     *                          pings.
      */
     public void setUseIcmpPing(@Nullable Boolean useSystemPing) {
         if (useSystemPing == null) {
@@ -175,7 +175,7 @@ public class PresenceDetection implements IPRequestReceivedCallback {
      * is not an IPv4 address. If the feature test for the native arping utility fails,
      * it will be disabled as well.
      *
-     * @param enable Enable or disable ARP ping
+     * @param enable          Enable or disable ARP ping
      * @param arpPingUtilPath c
      */
     private void setUseArpPing(boolean enable, @Nullable InetAddress destinationAddress) {
@@ -216,7 +216,7 @@ public class PresenceDetection implements IPRequestReceivedCallback {
     /**
      * sets the path to arp ping
      *
-     * @param enable Enable or disable ARP ping
+     * @param enable          Enable or disable ARP ping
      * @param arpPingUtilPath enableDHCPListen(useDHCPsniffing);
      */
     public void setUseArpPing(boolean enable, String arpPingUtilPath, ArpPingUtilEnum arpPingUtilMethod) {
@@ -264,8 +264,8 @@ public class PresenceDetection implements IPRequestReceivedCallback {
      * Return asynchronously the value of the presence detection as a PresenceDetectionValue.
      *
      * @param callback A callback with the PresenceDetectionValue. The callback may
-     *            not happen immediately if the cached value expired, but as soon as a new
-     *            discovery took place.
+     *                     not happen immediately if the cached value expired, but as soon as a new
+     *                     discovery took place.
      */
     public void getValue(Consumer<PresenceDetectionValue> callback) {
         cache.getValue(callback);
@@ -330,22 +330,22 @@ public class PresenceDetection implements IPRequestReceivedCallback {
             });
         }
 
-        // ARP ping for IPv4 addresses. Use single executor for Windows tool and 
+        // ARP ping for IPv4 addresses. Use single executor for Windows tool and
         // each own executor for each network interface for other tools
         if (arpPingMethod != ArpPingUtilEnum.ELI_FULKERSON_ARP_PING_FOR_WINDOWS) {
             executorService.execute(() -> {
-               Thread.currentThread().setName("presenceDetectionARP_" + hostname + " ");
-               // arp-ping.exe tool capable of handling multiple interfaces by itself
-               performARPping(null);
-               checkIfFinished();
+                Thread.currentThread().setName("presenceDetectionARP_" + hostname + " ");
+                // arp-ping.exe tool capable of handling multiple interfaces by itself
+                // performARPping(null);
+                checkIfFinished();
             });
-        } else if (interfaceNames != null) {                        
+        } else if (interfaceNames != null) {
             for (final String interfaceName : interfaceNames) {
                 executorService.execute(() -> {
-                   Thread.currentThread().setName("presenceDetectionARP_" + hostname + " " + interfaceName);
-                   performARPping(interfaceName);
-                   checkIfFinished();
-               });               
+                    Thread.currentThread().setName("presenceDetectionARP_" + hostname + " " + interfaceName);
+                    performARPping(interfaceName);
+                    checkIfFinished();
+                });
             }
         }
 
@@ -489,7 +489,7 @@ public class PresenceDetection implements IPRequestReceivedCallback {
      * called before performing the ARP ping.
      *
      * @param interfaceName The interface name. You can request a list of interface names
-     *            from {@see NetworkUtils.getInterfaceNames()} for example.
+     *                          from {@see NetworkUtils.getInterfaceNames()} for example.
      */
     protected void performARPping(String interfaceName) {
         try {

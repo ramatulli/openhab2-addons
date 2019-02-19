@@ -34,7 +34,7 @@
 			<parameter name="pollPeriod" type="integer" required="false" min="1" max="60">
 				<label>Poll Period</label>
 				<description>The Poll Period.</description>
-				<default>5</default>
+				<default>1</default>
 			</parameter>
 		</config-description>
 

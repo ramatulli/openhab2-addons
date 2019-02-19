@@ -36,7 +36,7 @@ public class Message {
      * Constructor.
      *
      * @param message
-     *            - the message received
+     *                    - the message received
      */
     public Message(String message) {
         this.message = message;
