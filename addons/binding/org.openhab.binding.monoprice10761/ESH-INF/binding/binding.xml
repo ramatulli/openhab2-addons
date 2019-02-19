@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/binding/v1.0.0 http://eclipse.org/smarthome/schemas/binding-1.0.0.xsd">
 
 	<name>Monoprice 10761 Multizone Amp Binding</name>
-	<description>This is the binding for Monoprice10761.</description>
+	<description>This is the binding for Monoprice 10761 Multizone Amp.</description>
 	<author>Cody Cutrer</author>
 
 </binding:binding>

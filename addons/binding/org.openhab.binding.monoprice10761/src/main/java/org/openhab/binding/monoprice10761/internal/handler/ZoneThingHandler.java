@@ -139,10 +139,10 @@ public class ZoneThingHandler extends BaseThingHandler {
         OnOffType onOffType;
 
         if (channelUID != null) {
+            int percentRange = 0;
             switch (channelUID.getId()) {
                 case VOLUME:
-                    double scaledVolume = state;
-                    updateState(channelUID, new PercentType((int) Math.round(scaledVolume * 2.63d)));
+                    percentRange = 38;
                     break;
                 case POWER:
                 case MUTE:
@@ -153,14 +153,21 @@ public class ZoneThingHandler extends BaseThingHandler {
                     updateState(channelUID, onOffType);
                     break;
                 case SOURCE:
+                    updateState(channelUID, new DecimalType(state));
+                    break;
                 case TREBLE:
                 case BASS:
+                    percentRange = 14;
+                    break;
                 case BALANCE:
-                    updateState(channelUID, new DecimalType(state));
+                    percentRange = 20;
                     break;
                 default:
                     logger.debug("updateChannel(): Zone Channel not updated - {}.", channelUID);
                     break;
+            }
+            if (percentRange != 0) {
+                updateState(channelUID, new PercentType((int) Math.round(state / (double) percentRange * 100)));
             }
         }
     }
@@ -176,6 +183,7 @@ public class ZoneThingHandler extends BaseThingHandler {
         if (bridgeHandler != null && bridgeHandler.isConnected()) {
             String ampCommand = "";
             int param = -1;
+            int percentRange = 0;
 
             switch (channelUID.getId()) {
                 case POWER:
@@ -186,21 +194,27 @@ public class ZoneThingHandler extends BaseThingHandler {
                     }
                     break;
                 case VOLUME:
-                    if (command instanceof DecimalType) {
-                        param = (int) Math.round(((DecimalType) command).doubleValue() / 2.63);
-                    } else if (command instanceof OnOffType) {
-                        param = ((OnOffType) command == OnOffType.ON) ? 19 : 0;
-                    }
-
+                    percentRange = 38;
                     break;
                 case SOURCE:
-                case TREBLE:
-                case BASS:
-                case BALANCE:
                     if (command instanceof DecimalType) {
                         param = ((DecimalType) command).intValue();
                     }
                     break;
+                case TREBLE:
+                case BASS:
+                    percentRange = 14;
+                    break;
+                case BALANCE:
+                    percentRange = 20;
+                    break;
+            }
+            if (percentRange != 0) {
+                if (command instanceof DecimalType) {
+                    param = (int) Math.round(((DecimalType) command).doubleValue() / 100d * percentRange);
+                } else if (command instanceof OnOffType) {
+                    param = ((OnOffType) command == OnOffType.ON) ? percentRange / 2 : 0;
+                }
             }
 
             switch (channelUID.getId()) {

@@ -26,15 +26,15 @@
 			</channel>
 			<channel id="treble" typeId="audio_param">
 				<label>Treble</label>
-				<description>Treble boost (0-14)</description>
+				<description>Treble boost (50% is 0, 0% is -7, 100% if +7)</description>
 			</channel>
 			<channel id="bass" typeId="audio_param">
-				<label>Base</label>
-				<description>Bass boost (0-14)</description>
+				<label>Bass</label>
+				<description>Bass boost (50% is 0, 0% is -7, 100% if +7)</description>
 			</channel>
 			<channel id="balance" typeId="balance">
 				<label>Balance</label>
-				<description>Balance (0-20; 10 is centered, 0 is full left, 20 is full right).</description>
+				<description>Balance (50% is centered, 0% is full left, 100% is full right).</description>
 			</channel>
 			<channel id="keypad" typeId="status">
 				<label>Keypad</label>
@@ -69,17 +69,15 @@
 	</channel-type>
 
 	<channel-type id="audio_param">
-		<item-type>Number</item-type>
+		<item-type>Dimmer</item-type>
 		<label>Treble/Bass Boost</label>
-		<description>Treble/Bass Boost (0-14)</description>
-		<state min="0" max="14"></state>
+		<description>Treble/Bass Boost</description>
 	</channel-type>
 
 	<channel-type id="balance">
-		<item-type>Number</item-type>
+		<item-type>Dimmer</item-type>
 		<label>Balance</label>
-		<description>Balance (0-20; 10 is centered, 0 is full left, 20 is full right).</description>
-		<state min="0" max="20"></state>
+		<description>Balance (50% is centered, 0% is full left, 100% is full right).</description>
 	</channel-type>
 
 	<channel-type id="status">
