@@ -9,7 +9,6 @@ Bundle-SymbolicName: org.openhab.binding.monoprice10761;singleton:=true
 Bundle-Vendor: openHAB
 Bundle-Version: 2.5.0.qualifier
 Import-Package: 
- gnu.io,
  org.apache.commons.io,
  org.eclipse.jdt.annotation;resolution:=optional,
  org.eclipse.smarthome.config.core,
@@ -21,6 +20,7 @@ Import-Package:
  org.eclipse.smarthome.core.thing.type,
  org.eclipse.smarthome.core.types,
  org.eclipse.smarthome.core.util,
+ org.eclipse.smarthome.io.transport.serial,
  org.osgi.framework,
  org.slf4j
 Service-Component: OSGI-INF/*.xml
