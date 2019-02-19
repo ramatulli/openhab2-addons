@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<thing:thing-descriptions bindingId="intesisbox"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:thing="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0"
+	xsi:schemaLocation="http://eclipse.org/smarthome/schemas/thing-description/v1.0.0 http://eclipse.org/smarthome/schemas/thing-description-1.0.0.xsd">
+
+	<thing-type id="intesisbox">
+		<label>IntesisBox Adapter</label>
+		<description>Represents a single IntesisBox adapter on the network, connected to an A/C unit.</description>
+		<category>HVAC</category>
+
+		<channels>
+			<channel id="onoff" typeId="system.power" />
+			<channel id="mode" typeId="Mode" />
+			<channel id="setptemp" typeId="SetPoint" />
+			<channel id="fansp" typeId="FanSpeed" />
+			<channel id="vaneud" typeId="VanePosition" />
+			<channel id="vanelr" typeId="VanePosition" />
+			<channel id="ambtemp" typeId="Temperature" />
+		</channels>
+
+		<config-description>
+			<parameter name="mac" type="text">
+				<label>MAC Address</label>
+				<description>MAC Address of the IntesisBox. If IP Address is not provided, the MAC will be used
+				to discover the current IP address of this specific box.</description>
+			</parameter>
+
+			<parameter name="ipAddress" type="text">
+				<label>IP Address</label>
+				<description>IP Address of the IntesisBox. Can be specified to directly communicate with an adapter,
+				rather than trying to discover it.</description>
+			</parameter>
+
+			<parameter name="port" type="integer" required="true">
+				<label>Port</label>
+				<description>The TCP port to the IntesisBox.</description>
+				<default>3310</default>
+			</parameter>
+
+		</config-description>
+
+	</thing-type>
+
+	<channel-type id="Mode">
+		<item-type>String</item-type>
+		<label>Mode</label>
+		<description>Current mode of the thermostat</description>
+		<state>
+			<options>
+				<option value="AUTO">auto heat/cool</option>
+				<option value="HEAT">heating</option>
+				<option value="DRY">dehumidify</option>
+				<option value="FAN">fan only</option>
+				<option value="COOL">cooling</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="SetPoint">
+		<item-type>Number:Temperature</item-type>
+		<label>Set Point</label>
+		<description>The set point temperature</description>
+		<category>Temperature</category>
+		<tags>
+			<tag>TargetTemperature</tag>
+		</tags>
+		<state pattern="%.1f %unit%" step="0.5" />
+	</channel-type>
+
+	<channel-type id="FanSpeed">
+		<item-type>String</item-type>
+		<label>Fan Speed</label>
+		<description>The fan speed</description>
+		<state>
+			<options>
+				<option value="AUTO">auto</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="VanePosition">
+		<item-type>String</item-type>
+		<label>Vane Position</label>
+		<description>Vane position</description>
+		<state>
+			<options>
+				<option value="AUTO">auto</option>
+				<option value="1">1</option>
+				<option value="2">2</option>
+				<option value="3">3</option>
+				<option value="4">4</option>
+				<option value="5">5</option>
+				<option value="6">6</option>
+				<option value="7">7</option>
+				<option value="8">8</option>
+				<option value="9">9</option>
+				<option value="SWING">swing</option>
+				<option value="PULSE">pulse</option>
+			</options>
+		</state>
+	</channel-type>
+
+	<channel-type id="Temperature">
+		<item-type>Number:Temperature</item-type>
+		<label>Temperature</label>
+		<description>Ambient temperature</description>
+		<category>Temperature</category>
+		<tags>
+			<tag>CurrentTemperature</tag>
+		</tags>
+		<state readOnly="true" pattern="%.1f %unit%" />
+	</channel-type>
+</thing:thing-descriptions>
