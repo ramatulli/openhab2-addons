@@ -15,6 +15,7 @@ package org.openhab.binding.monoprice10761.internal;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
@@ -27,12 +28,14 @@ import org.eclipse.smarthome.core.thing.ThingUID;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
+import org.eclipse.smarthome.io.transport.serial.SerialPortManager;
 import org.openhab.binding.monoprice10761.internal.config.AmpConfiguration;
 import org.openhab.binding.monoprice10761.internal.config.Monoprice10761ZoneConfiguration;
 import org.openhab.binding.monoprice10761.internal.handler.AmpHandler;
 import org.openhab.binding.monoprice10761.internal.handler.ZoneThingHandler;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The {@link Monoprice10761HandlerFactory} is responsible for creating things and thing
@@ -45,6 +48,7 @@ import org.osgi.service.component.annotations.Component;
 public class Monoprice10761HandlerFactory extends BaseThingHandlerFactory {
 
     private final Map<ThingUID, ServiceRegistration<?>> discoveryServiceRegistrations = new HashMap<>();
+    private @NonNullByDefault({}) Supplier<SerialPortManager> serialPortManagerSupplier = () -> null;
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -107,7 +111,7 @@ public class Monoprice10761HandlerFactory extends BaseThingHandlerFactory {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (Monoprice10761BindingConstants.AMP_THING_TYPE.equals(thingTypeUID)) {
-            AmpHandler handler = new AmpHandler((Bridge) thing);
+            AmpHandler handler = new AmpHandler((Bridge) thing, serialPortManagerSupplier);
             registerDiscoveryService(handler);
             return handler;
         } else if (Monoprice10761BindingConstants.ZONE_THING_TYPE.equals(thingTypeUID)) {
@@ -144,5 +148,14 @@ public class Monoprice10761HandlerFactory extends BaseThingHandlerFactory {
         ServiceRegistration<?> discoveryServiceRegistration = bundleContext
                 .registerService(DiscoveryService.class.getName(), discoveryService, new Hashtable<>());
         discoveryServiceRegistrations.put(bridgeHandler.getThing().getUID(), discoveryServiceRegistration);
+    }
+
+    @Reference
+    protected void setSerialPortManager(SerialPortManager serialPortManager) {
+        serialPortManagerSupplier = () -> serialPortManager;
+    }
+
+    protected void unsetSerialPortManager(SerialPortManager serialPortManager) {
+        this.serialPortManagerSupplier = () -> null;
     }
 }

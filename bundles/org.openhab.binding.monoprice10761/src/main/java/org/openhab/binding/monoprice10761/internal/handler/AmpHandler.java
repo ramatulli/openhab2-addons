@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.TooManyListenersException;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Supplier;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.smarthome.config.core.Configuration;
@@ -35,21 +36,19 @@ import org.eclipse.smarthome.core.thing.ThingStatus;
 import org.eclipse.smarthome.core.thing.binding.BaseBridgeHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
+import org.eclipse.smarthome.io.transport.serial.PortInUseException;
+import org.eclipse.smarthome.io.transport.serial.SerialPort;
+import org.eclipse.smarthome.io.transport.serial.SerialPortEvent;
+import org.eclipse.smarthome.io.transport.serial.SerialPortEventListener;
+import org.eclipse.smarthome.io.transport.serial.SerialPortIdentifier;
+import org.eclipse.smarthome.io.transport.serial.SerialPortManager;
+import org.eclipse.smarthome.io.transport.serial.UnsupportedCommOperationException;
 import org.openhab.binding.monoprice10761.internal.Message;
 import org.openhab.binding.monoprice10761.internal.Monoprice10761DiscoveryService;
 import org.openhab.binding.monoprice10761.internal.config.AmpConfiguration;
 import org.openhab.binding.monoprice10761.internal.config.Monoprice10761ZoneConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import gnu.io.CommPort;
-import gnu.io.CommPortIdentifier;
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.SerialPort;
-import gnu.io.SerialPortEvent;
-import gnu.io.SerialPortEventListener;
-import gnu.io.UnsupportedCommOperationException;
 
 /**
  * The bridge handler for the DSC IT100 RS232 Serial interface.
@@ -89,13 +88,16 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
     private OutputStreamWriter serialOutput = null;
     private BufferedReader serialInput = null;
 
+    private final Supplier<SerialPortManager> serialPortManagerSupplier;
+
     /**
      * Constructor.
      *
      * @param bridge
      */
-    public AmpHandler(Bridge bridge) {
+    public AmpHandler(Bridge bridge, Supplier<SerialPortManager> serialPortManagerSupplier) {
         super(bridge);
+        this.serialPortManagerSupplier = serialPortManagerSupplier;
     }
 
     @Override
@@ -345,10 +347,14 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
         try {
             logger.debug("openConnection(): Connecting to Ampt ");
 
-            CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(serialPortName);
-            CommPort commPort = portIdentifier.open(this.getClass().getName(), 2000);
+            SerialPortIdentifier portIdentifier = serialPortManagerSupplier.get().getIdentifier(serialPortName);
+            if (portIdentifier == null) {
+                logger.error("openConnection();: No Such Port");
+                setConnected(false);
+                return;
+            }
+            serialPort = portIdentifier.open(this.getClass().getName(), 2000);
 
-            serialPort = (SerialPort) commPort;
             serialPort.setSerialPortParams(baudRate, SerialPort.DATABITS_8, SerialPort.STOPBITS_1,
                     SerialPort.PARITY_NONE);
             serialPort.enableReceiveThreshold(1);
@@ -360,9 +366,6 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
             setSerialEventHandler(this);
 
             setConnected(true);
-        } catch (NoSuchPortException noSuchPortException) {
-            logger.error("openConnection(): No Such Port Exception: {}", noSuchPortException.getMessage());
-            setConnected(false);
         } catch (PortInUseException portInUseException) {
             logger.error("openConnection(): Port in Use Exception: {}", portInUseException.getMessage());
             setConnected(false);
@@ -491,7 +494,7 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
     }
 
     /**
-     * Handles an incoming message from the DSC Alarm System.
+     * Handles an incoming message from the amp.
      *
      * @param incomingMessage
      */
