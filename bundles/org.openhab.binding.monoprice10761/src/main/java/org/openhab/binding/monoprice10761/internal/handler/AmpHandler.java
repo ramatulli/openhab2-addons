@@ -20,6 +20,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TooManyListenersException;
 import java.util.concurrent.ScheduledFuture;
@@ -51,7 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The bridge handler for the DSC IT100 RS232 Serial interface.
+ * The bridge handler for the Monoprice 10761 Amp
  *
  * @author Cody Cutrer - Initial Contribution
  */
@@ -87,6 +88,9 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
     private SerialPort serialPort = null;
     private OutputStreamWriter serialOutput = null;
     private BufferedReader serialInput = null;
+    private ArrayList<String> queuedWrites = new ArrayList<String>();
+     private boolean isReady = false;
+     private StringBuilder pendingMessage = new StringBuilder();
 
     private final Supplier<SerialPortManager> serialPortManagerSupplier;
 
@@ -179,12 +183,9 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
         // interrupted communication, then request stats for all
         // three units to discover how many units there are
         write("\r\n");
-        write("?10\r\n");
-        write("?20\r\n");
-        write("?20\r\n");
-        write("?30\r\n");
-        write("?30\r\n");
-        write("?30\r\n");
+        queueWrite("?10\r\n");
+        queueWrite("?20\r\n");
+        queueWrite("?30\r\n");
 
         thingsHaveChanged = true;
     }
@@ -258,7 +259,7 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
 
         if (isConnected()) {
             for (int i = 1; i <= numUnits; i++) {
-                write(String.format("?%d0\r\n", i));
+                queueWrite(String.format("?%d0\r\n", i));
             }
 
             checkThings();
@@ -345,7 +346,7 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
 
     public void openConnection() {
         try {
-            logger.debug("openConnection(): Connecting to Ampt ");
+            logger.debug("openConnection(): Connecting to Amp ");
 
             SerialPortIdentifier portIdentifier = serialPortManagerSupplier.get().getIdentifier(serialPortName);
             if (portIdentifier == null) {
@@ -383,7 +384,19 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
         }
     }
 
-    public void write(String writeString) {
+     public synchronized void queueWrite(String writeString) {
+         if (isReady) {
+             logger.debug("doing immediate write");
+             isReady = false;
+             write(writeString);
+         } else {
+             if (!queuedWrites.contains(writeString)) {
+                 queuedWrites.add(writeString);
+             }
+         }
+     }
+
+     public void write(String writeString) {
         try {
             serialOutput.write(writeString);
             serialOutput.flush();
@@ -397,35 +410,11 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
         }
     }
 
-    public String read() {
-        String message = "";
-
-        try {
-            message = readLine();
-            logger.debug("read(): Message Received: {}", message);
-        } catch (IOException ioException) {
-            logger.error("read(): IO Exception: {} ", ioException.getMessage());
-            setConnected(false);
-        } catch (Exception exception) {
-            logger.error("read(): Exception: {} ", exception.getMessage(), exception);
-            setConnected(false);
-        }
-
-        return message;
-    }
-
-    /**
-     * Read a line from the Input Stream.
-     *
-     * @return
-     * @throws IOException
-     */
-    private String readLine() throws IOException {
-        return serialInput.readLine();
-    }
-
     public void closeConnection() {
         logger.debug("closeConnection(): Closing Serial Connection!");
+
+        isReady = false;
+        queuedWrites.clear();
 
         if (serialPort == null) {
             setConnected(false);
@@ -469,10 +458,33 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
     public synchronized void serialEvent(SerialPortEvent serialPortEvent) {
         if (serialPortEvent.getEventType() == SerialPortEvent.DATA_AVAILABLE) {
             try {
-                String messageLine = serialInput.readLine();
-                handleIncomingMessage(messageLine);
+                int nextChar = 0;
+                 while (serialInput.ready()) {
+                     nextChar = serialInput.read();
+                     if (nextChar == '\r' || nextChar == '\n') {
+                         String messageLine = pendingMessage.toString();
+                         pendingMessage.setLength(0);
+                         handleIncomingMessage(messageLine);
+                     } else {
+                         pendingMessage.append((char) nextChar);
+                     }
+                 }
+                 // No more data, and the last line is a bare # with no delimiter,
+                 // then it's asking for the next command
+                 if (nextChar == '#' && pendingMessage.length() == 1) {
+                     logger.debug("ready for next command");
+                     if (queuedWrites.isEmpty()) {
+                         logger.debug("nothing to write");
+                         isReady = true;
+                     } else {
+                         write(queuedWrites.remove(0));
+                     }
+                 }
+                 logger.debug("nothing more to read");
             } catch (IOException ioException) {
                 logger.error("serialEvent(): IO Exception: {}", ioException.getMessage());
+            } catch (Exception e) {
+                logger.error("serialEvent(): Exception: {}", e.getMessage());
             }
         }
     }
@@ -566,7 +578,7 @@ public class AmpHandler extends BaseBridgeHandler implements SerialPortEventList
     public boolean sendCommand(int zone, String command, int param) {
         String data = String.format("<%02d%s%02d\r\n", zone, command, param);
 
-        write(data);
+        queueWrite(data);
         logger.debug("sendCommand(): '{}' Command Sent - {} {}", zone, command, param);
 
         return true;

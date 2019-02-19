@@ -67,7 +67,7 @@ public class Monoprice10761HandlerFactory extends BaseThingHandlerFactory {
         }
 
         throw new IllegalArgumentException(
-                "createThing(): The thing type " + thingTypeUID + " is not supported by the DSC Alarm binding.");
+                "createThing(): The thing type " + thingTypeUID + " is not supported by the Monoprice 10761 binding.");
     }
 
     /**

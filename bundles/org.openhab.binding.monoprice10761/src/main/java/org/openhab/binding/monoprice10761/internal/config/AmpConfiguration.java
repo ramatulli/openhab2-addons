@@ -13,7 +13,7 @@
 package org.openhab.binding.monoprice10761.internal.config;
 
 /**
- * Configuration class for the DSC IT100 RS232 Serial interface bridge, used to connect to the DSC Alarm system.
+ * Configuration class for the Monoprice 10761 Amp.
  *
  * @author Cody Cutrer - Initial contribution
  */
@@ -37,7 +37,7 @@ public class AmpConfiguration {
     public Integer baud;
 
     /**
-     * The Amp Poll Period. Can be set in range 1-15 minutes. Default is 1 minute;
+     * The Amp Poll Period. Can be set in range 1-60 seconds. Default is 1 second;
      */
     public Integer pollPeriod;
 }
