@@ -99,10 +99,13 @@ public class IntesisBoxHandler extends BaseThingHandler {
                     QuantityType<Temperature> celsiusTemperature = ((QuantityType<Temperature>) command)
                             .toUnit(SIUnits.CELSIUS);
                     if (celsiusTemperature != null) {
-                        value = String.valueOf((int) Math.round(celsiusTemperature.doubleValue() * 10));
-                        if (!checkTempLimit(celsiusTemperature.doubleValue())) {
-                            value = "";
+                        double doubleValue = celsiusTemperature.doubleValue();
+                        if (doubleValue < minTemp) {
+                            doubleValue = minTemp;
+                        } else if (doubleValue > maxTemp) {
+                            doubleValue = maxTemp;
                         }
+                        value = String.valueOf((int) Math.round(doubleValue * 10));
                     }
                 }
             case MODE:
@@ -156,10 +159,6 @@ public class IntesisBoxHandler extends BaseThingHandler {
                 break;
         }
 
-    }
-
-    private synchronized boolean checkTempLimit(double value) {
-        return value >= minTemp && value <= maxTemp;
     }
 
     private synchronized boolean checkLimit(String function, String value) {
