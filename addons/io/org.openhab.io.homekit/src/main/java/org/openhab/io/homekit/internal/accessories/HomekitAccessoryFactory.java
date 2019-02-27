@@ -129,6 +129,9 @@ public class HomekitAccessoryFactory {
                 return new HomekitSmokeSensorImpl(carbonMonoxideSensorAccessory, itemRegistry, updater,
                         BatteryStatus.getFromCharacteristics(characteristicItems));
 
+            case SECURITY_SYSTEM:
+                return new HomekitSecuritySystemImpl(taggedItem, itemRegistry, updater,
+                        getCharacteristicItems(taggedItem));
         }
 
         throw new Exception("Unknown homekit type: " + taggedItem.getAccessoryType());
@@ -137,14 +140,12 @@ public class HomekitAccessoryFactory {
     /**
      * Given an accessory group, return the item in the group tagged as an accessory.
      *
-     * @param taggedItem The group item containing our item, or, the accessory item.
+     * @param taggedItem    The group item containing our item, or, the accessory item.
      * @param accessoryType The accessory type for which we're looking
      * @return
      */
     private static Optional<HomekitTaggedItem> getPrimaryAccessory(HomekitTaggedItem taggedItem,
             HomekitAccessoryType accessoryType, ItemRegistry itemRegistry) {
-        logger.info("{} isGroup? {}", taggedItem.getName(), taggedItem.isGroup(),
-                taggedItem.isMemberOfAccessoryGroup());
         if (taggedItem.isGroup()) {
             GroupItem groupItem = (GroupItem) taggedItem.getItem();
             return groupItem.getMembers().stream().filter(item -> item.hasTag(accessoryType.getTag())).findFirst()
