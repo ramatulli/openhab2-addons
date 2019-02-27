@@ -75,26 +75,29 @@ Complex accessories require a tag on a Group indicating the accessory type, as w
 
 A full list of supported accessory types can be found in the table below.
 
-| Tag                   | Child tag                         | Supported items           | Description                                                                                                                                                                                                                                   |
-|--------------------   |----------------------------       |-----------------------    |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
-| Lighting              |                                   | Switch, Dimmer, Color     | A lightbulb, switchable, dimmable or rgb                                                                                                                                                                                                      |
-| Switchable            |                                   | Switch, Dimmer, Color     | An accessory that can be turned off and on. While similar to a lightbulb, this will be presented differently in the Siri grammar and iOS apps                                                                                                 |
-| ContactSensor         |                                   | Contact                   | An accessory with on/off state that can be viewed in HomeKit but not changed such as a contact sensor for a door or window                                                                                                                    |
-| CurrentTemperature    |                                   | Number                    | An accessory that provides a single read-only temperature value. The units default to celsius but can be overridden globally using the useFahrenheitTemperature global property                                                               |
-| CurrentHumidity       |                                   | Number                    | An accessory that provides a single read-only value indicating the relative humidity.                                                                                                                                                         |
-| Thermostat            |                                   | Group                     | A thermostat requires all child tags defined below                                                                                                                                                                                            |
-|                       | TargetTemperature                 | Number                    | A target temperature that will engage the thermostat's heating and cooling actions as necessary, depending on the heatingCoolingMode |
-|                       | homekit:CurrentTemperature        | Number                    | The current temperature, same as above |
-|                       | homekit:TargetHeatingCoolingMode  | String                    | Item used to set and get the current target mode of the device: OFF, AUTO, HEAT, COOL. The string's value must match those defined in the `thermostat*Mode` | 
-|                       | homekit:CurrentHeatingCoolingMode | String                    | (Optional) Item used to read the current state of the device: OFF, HEATING, COOLING. The string's value must match those defined in the `thermostat*State` properties. |
-| LeakSensor            |                                   | Switch, ContactSensor     | Leak sensor. ON / OPEN state means flood detected. |
-| MotionSensor          |                                   | Switch, ContactSensor     | Motion sensor. ON / OPEN state means motion detected. |
-| OccupancySensor       |                                   | Switch, ContactSensor     | Occupancy sensor. ON / OPEN state means occupancy detected. |
-| Valve                 |                                   | Switch                    | Simple open/close valve. Assumes liquid is flowing when valve is open. |
-| WindowCovering        |                                   | Rollershutter             | Simple window covering with support for setting target position / current position support. |
-| SmokeSensor           |                                   | Switch, ContactSensor     | Smoke detector. ON / OPEN state means smokes detected. |
-| CarbonMonoxideSensor  |                                   | Switch, ContactSensor     | CO detector. ON / OPEN state means smoke detected (it currently appears that Home.app on iOS doesn't distinguish between a smoke and CO detector). |
-| Fan                   |                                   | Switch, Dimmer            | Fan with or without speed control. |
+| Tag                   | Child tag                          | Supported items           | Description                                                                                                                                                                                                                                   |
+|--------------------   |----------------------------        |-----------------------    |---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------  |
+| Lighting              |                                    | Switch, Dimmer, Color     | A lightbulb, switchable, dimmable or rgb                                                                                                                                                                                                      |
+| Switchable            |                                    | Switch, Dimmer, Color     | An accessory that can be turned off and on. While similar to a lightbulb, this will be presented differently in the Siri grammar and iOS apps                                                                                                 |
+| ContactSensor         |                                    | Contact                   | An accessory with on/off state that can be viewed in HomeKit but not changed such as a contact sensor for a door or window                                                                                                                    |
+| CurrentTemperature    |                                    | Number                    | An accessory that provides a single read-only temperature value. The units default to celsius but can be overridden globally using the useFahrenheitTemperature global property                                                               |
+| CurrentHumidity       |                                    | Number                    | An accessory that provides a single read-only value indicating the relative humidity.                                                                                                                                                         |
+| Thermostat            |                                    | Group                     | A thermostat requires all child tags defined below                                                                                                                                                                                            |
+|                       | TargetTemperature                  | Number                    | A target temperature that will engage the thermostat's heating and cooling actions as necessary, depending on the heatingCoolingMode |
+|                       | homekit:CurrentTemperature         | Number                    | The current temperature, same as above |
+|                       | homekit:TargetHeatingCoolingMode   | String                    | Item used to set and get the current target mode of the device: OFF, AUTO, HEAT, COOL. The string's value must match those defined in the `thermostat*Mode` | 
+|                       | homekit:CurrentHeatingCoolingMode  | String                    | (Optional) Item used to read the current state of the device: OFF, HEATING, COOLING. The string's value must match those defined in the `thermostat*State` properties. |
+| LeakSensor            |                                    | Switch, ContactSensor     | Leak sensor. ON / OPEN state means flood detected. |
+| MotionSensor          |                                    | Switch, ContactSensor     | Motion sensor. ON / OPEN state means motion detected. |
+| OccupancySensor       |                                    | Switch, ContactSensor     | Occupancy sensor. ON / OPEN state means occupancy detected. |
+| Valve                 |                                    | Switch                    | Simple open/close valve. Assumes liquid is flowing when valve is open. |
+| WindowCovering        |                                    | Rollershutter             | Simple window covering with support for setting target position / current position support. |
+| SmokeSensor           |                                    | Switch, ContactSensor     | Smoke detector. ON / OPEN state means smokes detected. |
+| CarbonMonoxideSensor  |                                    | Switch, ContactSensor     | CO detector. ON / OPEN state means smoke detected (it currently appears that Home.app on iOS doesn't distinguish between a smoke and CO detector). |
+| Fan                   |                                    | Switch, Dimmer            | Fan with or without speed control. |
+| SecuritySystem        |                                    | Group                     | A security system requires both child tags defined below |
+|                       | homekit:CurrentSecuritySystemState | String                    | The current state of the security system. STAY_ARM / AWAY_ARM / NIGHT_ARM / DISARMED / TRIGGERED |
+|                       | homekit:TargetSecuritySystemState  | String                    | The requested state of the security system. STAY_ARM / AWAY_ARM / NIGHT_ARM / DISARM. While the requested state is not DISARM, and the current state is DISARMED, HomeKit will display "Arming...", for example during an exit delay. |
 
 
 See the sample below for example items:
@@ -118,6 +121,10 @@ Rollershutter MasterWindow_Blinds "Master Window Blinds" [ "WindowCovering" ]
 
 Dimmer FamilyRoomFan "Family Room Fan" <fan> [ "Fan" ]
 Switch BathroomFan "Bathroom Fan" <fan> [ "Fan" ]
+
+Group gAlarm "Security System" [ "SecuritySystem" ]
+String Alarm_CurrentState (gAlarm) [ "homekit:CurrentSecuritySystemState" ]
+String Alarm_TargetState (gAlarm) [ "homekit:TargetSecuritySystemState" ]
 ```
 
 ## Common Problems
@@ -172,4 +179,70 @@ In order to get logs from the underlying library used to implement the HomeKit p
 ```
 openhab> log:set TRACE com.beowulfe.hap
 openhab> log:tail com.beowulfe.hap
+```
+
+## Full Security System Example
+
+This example associates a DSC Alarm with HomeKit. Proxy items are created for HomeKit, since the commands don't map exactly, and rules are used to
+maintain them. Additionally, `NIGHT_ARM` isn't supported, so it's automatically mapped to `STAY_ARM`.
+
+```alarm.items
+Number Alarm_Mode "Arm Mode" <lock> { channel="dscalarm:partition:46c52f35:partition1:partition_arm_mode" }
+Switch Alarm_Armed "Armed Status" <lock> { channel="dscalarm:partition:46c52f35:partition1:partition_armed" }
+Switch Alarm_InAlarm "In Alarm" <lock> { channel="dscalarm:partition:46c52f35:partition1:partition_in_alarm" }
+
+Group gAlarm "Security System" [ "SecuritySystem" ]
+String Alarm_CurrentState (gAlarm) [ "homekit:CurrentSecuritySystemState" ]
+String Alarm_TargetState (gAlarm) [ "homekit:TargetSecuritySystemState" ]
+```
+
+```alarm.rules
+rule "HomeKit Support"
+when
+  Item Alarm_TargetState changed
+then
+  if (Alarm_TargetState.state == 'DISARM') {
+    Alarm_Mode.sendCommand(0)
+  } else if (Alarm_TargetState.state == "AWAY_ARM") {
+    Alarm_Mode.sendCommand(1)
+  } else if (Alarm_TargetState.state == "STAY_ARM") {
+    Alarm_Mode.sendCommand(2)
+  } else if (Alarm_TargetState.state == "NIGHT_ARM") {
+    Alarm_TargetState.postUpdate("STAY_ARM")
+  }
+end
+
+rule "HomeKit Support"
+when
+  Item Alarm_Mode changed
+then
+  if (Alarm_Mode.state == 0) {
+    Alarm_TargetState.postUpdate("DISARM")
+  } else if (Alarm_Mode.state == 1) {
+    Alarm_TargetState.postUpdate("AWAY_ARM")
+  } else {
+    Alarm_TargetState.postUpdate("STAY_ARM")
+  }
+end
+
+rule "HomeKit Support"
+when
+  Item Alarm_Armed changed or
+  Item Alarm_InAlarm changed
+then
+  if (Alarm_InAlarm.state == ON) {
+    Alarm_CurrentState.postUpdate("TRIGGERED")
+  } else if (Alarm_Armed.state == ON) {
+    if (Alarm_Mode.state == 1) {
+       Alarm_CurrentState.postUpdate("AWAY_ARM")
+       Alarm_TargetState.postUpdate("AWAY_ARM")
+    } else {
+       Alarm_CurrentState.postUpdate("STAY_ARM")
+       Alarm_TargetState.postUpdate("STAY_ARM")
+    }
+  } else {
+    Alarm_CurrentState.postUpdate("DISARMED")
+    Alarm_TargetState.postUpdate("DISARM")
+  }
+end
 ```
