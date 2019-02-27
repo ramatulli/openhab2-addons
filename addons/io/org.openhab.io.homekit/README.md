@@ -190,6 +190,7 @@ maintain them. Additionally, `NIGHT_ARM` isn't supported, so it's automatically 
 Number Alarm_Mode "Arm Mode" <lock> { channel="dscalarm:partition:46c52f35:partition1:partition_arm_mode" }
 Switch Alarm_Armed "Armed Status" <lock> { channel="dscalarm:partition:46c52f35:partition1:partition_armed" }
 Switch Alarm_InAlarm "In Alarm" <lock> { channel="dscalarm:partition:46c52f35:partition1:partition_in_alarm" }
+Switch Alarm_ExitDelay "Exit Delay" { channel="dscalarm:partition:46c52f35:partition1:partition_exit_delay" }
 
 Group gAlarm "Security System" [ "SecuritySystem" ]
 String Alarm_CurrentState (gAlarm) [ "homekit:CurrentSecuritySystemState" ]
@@ -199,16 +200,16 @@ String Alarm_TargetState (gAlarm) [ "homekit:TargetSecuritySystemState" ]
 ```alarm.rules
 rule "HomeKit Support"
 when
-  Item Alarm_TargetState changed
+  Item Alarm_TargetState received command
 then
-  if (Alarm_TargetState.state == 'DISARM') {
+  if (receivedCommand == "DISARM") {
     Alarm_Mode.sendCommand(0)
-  } else if (Alarm_TargetState.state == "AWAY_ARM") {
+  } else if (receivedCommand == "AWAY_ARM") {
     Alarm_Mode.sendCommand(1)
-  } else if (Alarm_TargetState.state == "STAY_ARM") {
+  } else if (receivedCommand == "STAY_ARM") {
     Alarm_Mode.sendCommand(2)
-  } else if (Alarm_TargetState.state == "NIGHT_ARM") {
-    Alarm_TargetState.postUpdate("STAY_ARM")
+  } else {
+    Alarm_TargetState.sendCommand("STAY_ARM")
   }
 end
 
@@ -223,6 +224,17 @@ then
   } else {
     Alarm_TargetState.postUpdate("STAY_ARM")
   }
+end
+
+rule "HomeKit Support"
+when
+  Item Alarm_ExitDelay changed
+then
+  if (Alarm_ExitDelay.state == ON && Alarm_TargetState.state == "DISARM") {
+    Alarm_TargetState.postUpdate("AWAY_ARM")
+  } else if (Alarm_ExitDelay.state == OFF && Alarm_Mode.state == 0) {
+    Alarm_TargetState.postUpdate("DISARM")
+  }     
 end
 
 rule "HomeKit Support"
