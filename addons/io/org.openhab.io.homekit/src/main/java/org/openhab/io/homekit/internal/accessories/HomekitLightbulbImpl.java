@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.smarthome.core.items.GenericItem;
 import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.eclipse.smarthome.core.library.items.ColorItem;
 import org.eclipse.smarthome.core.library.items.DimmerItem;
 import org.eclipse.smarthome.core.library.items.SwitchItem;
@@ -42,8 +43,8 @@ import com.beowulfe.hap.accessories.characteristics.Color;
 class HomekitLightbulbImpl extends AbstractHomekitAccessoryImpl<GenericItem> implements Lightbulb, Brightness, Color {
 
     public HomekitLightbulbImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater) {
-        super(taggedItem, itemRegistry, updater, GenericItem.class);
+            MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater) {
+        super(taggedItem, itemRegistry, metadataRegistry, updater, GenericItem.class);
     }
 
     @Override

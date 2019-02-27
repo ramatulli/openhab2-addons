@@ -15,6 +15,7 @@ package org.openhab.io.homekit.internal.accessories;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.eclipse.smarthome.core.library.items.NumberItem;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.openhab.io.homekit.internal.HomekitAccessoryUpdater;
@@ -30,8 +31,8 @@ import com.beowulfe.hap.accessories.HumiditySensor;
 public class HomekitHumiditySensorImpl extends AbstractHomekitAccessoryImpl<NumberItem> implements HumiditySensor {
 
     public HomekitHumiditySensorImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater) {
-        super(taggedItem, itemRegistry, updater, NumberItem.class);
+            MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater) {
+        super(taggedItem, itemRegistry, metadataRegistry, updater, NumberItem.class);
     }
 
     @Override

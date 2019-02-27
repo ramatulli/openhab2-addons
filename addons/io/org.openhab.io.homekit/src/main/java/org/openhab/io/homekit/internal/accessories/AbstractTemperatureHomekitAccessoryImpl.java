@@ -14,6 +14,7 @@ package org.openhab.io.homekit.internal.accessories;
 
 import org.eclipse.smarthome.core.items.GenericItem;
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.openhab.io.homekit.internal.HomekitAccessoryUpdater;
 import org.openhab.io.homekit.internal.HomekitSettings;
 import org.openhab.io.homekit.internal.HomekitTaggedItem;
@@ -31,8 +32,9 @@ abstract class AbstractTemperatureHomekitAccessoryImpl<T extends GenericItem> ex
     private final HomekitSettings settings;
 
     public AbstractTemperatureHomekitAccessoryImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater, HomekitSettings settings, Class<T> expectedItemClass) {
-        super(taggedItem, itemRegistry, updater, expectedItemClass);
+            MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater, HomekitSettings settings,
+            Class<T> expectedItemClass) {
+        super(taggedItem, itemRegistry, metadataRegistry, updater, expectedItemClass);
         this.settings = settings;
     }
 

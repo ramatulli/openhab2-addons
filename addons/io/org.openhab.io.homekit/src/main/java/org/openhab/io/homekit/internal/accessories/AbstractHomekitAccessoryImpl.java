@@ -16,6 +16,9 @@ import org.eclipse.smarthome.core.items.GenericItem;
 import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.Metadata;
+import org.eclipse.smarthome.core.items.MetadataKey;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.openhab.io.homekit.internal.HomekitAccessoryUpdater;
 import org.openhab.io.homekit.internal.HomekitTaggedItem;
 import org.slf4j.Logger;
@@ -35,16 +38,20 @@ abstract class AbstractHomekitAccessoryImpl<T extends GenericItem> implements Ho
     private final String itemName;
     private final String itemLabel;
     private final ItemRegistry itemRegistry;
+    private final MetadataRegistry metadataRegistry;
+    private final Metadata metadata;
     private final HomekitAccessoryUpdater updater;
 
     protected Logger logger = LoggerFactory.getLogger(AbstractHomekitAccessoryImpl.class);
 
     public AbstractHomekitAccessoryImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater, Class<T> expectedItemClass) {
+            MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater, Class<T> expectedItemClass) {
         this.accessoryId = taggedItem.getId();
         this.itemName = taggedItem.getItem().getName();
         this.itemLabel = taggedItem.getItem().getLabel();
         this.itemRegistry = itemRegistry;
+        this.metadataRegistry = metadataRegistry;
+        this.metadata = metadataRegistry.get(new MetadataKey("homekit", itemName));
         this.updater = updater;
         Item baseItem = taggedItem.getItem();
         if (baseItem instanceof GroupItem && ((GroupItem) baseItem).getBaseItem() != null) {
@@ -89,6 +96,22 @@ abstract class AbstractHomekitAccessoryImpl<T extends GenericItem> implements Ho
 
     protected ItemRegistry getItemRegistry() {
         return itemRegistry;
+    }
+
+    protected MetadataRegistry getMetadataRegistry() {
+        return metadataRegistry;
+    }
+
+    protected Metadata getMetadata() {
+        return metadata;
+    }
+
+    protected Object getMetadataSetting(String key) {
+        if (getMetadata() != null) {
+            return getMetadata().getConfiguration().get(key);
+        } else {
+            return null;
+        }
     }
 
     protected String getItemName() {

@@ -15,6 +15,7 @@ package org.openhab.io.homekit.internal.accessories;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.eclipse.smarthome.core.library.items.RollershutterItem;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.openhab.io.homekit.internal.HomekitAccessoryUpdater;
@@ -32,8 +33,8 @@ public class HomekitWindowCoveringImpl extends AbstractHomekitAccessoryImpl<Roll
         implements WindowCovering {
 
     public HomekitWindowCoveringImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater) {
-        super(taggedItem, itemRegistry, updater, RollershutterItem.class);
+            MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater) {
+        super(taggedItem, itemRegistry, metadataRegistry, updater, RollershutterItem.class);
     }
 
     @Override

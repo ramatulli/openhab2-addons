@@ -26,6 +26,7 @@ import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemNotFoundException;
 import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.items.ItemRegistryChangeListener;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.openhab.io.homekit.internal.accessories.HomekitAccessoryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +42,7 @@ import com.beowulfe.hap.HomekitRoot;
 public class HomekitChangeListener implements ItemRegistryChangeListener {
 
     private ItemRegistry itemRegistry;
+    private MetadataRegistry metadataRegistry;
     private HomekitAccessoryUpdater updater = new HomekitAccessoryUpdater();
     private Logger logger = LoggerFactory.getLogger(HomekitChangeListener.class);
     private final HomekitAccessoryRegistry accessoryRegistry = new HomekitAccessoryRegistry();
@@ -115,7 +117,7 @@ public class HomekitChangeListener implements ItemRegistryChangeListener {
             String name = iter.next();
             accessoryRegistry.remove(name);
 
-            getItemOptional(name).map(i -> new HomekitTaggedItem(i, itemRegistry))
+            getItemOptional(name).map(i -> new HomekitTaggedItem(i, itemRegistry, metadataRegistry))
                     .filter(i -> i.isAccessory() && !i.isMemberOfAccessoryGroup())
                     .ifPresent(rootItem -> createRootAccessory(rootItem));
         }
@@ -140,6 +142,11 @@ public class HomekitChangeListener implements ItemRegistryChangeListener {
         maybeInitialize();
     }
 
+    public synchronized void setMetadataRegistry(MetadataRegistry metadataRegistry) {
+        this.metadataRegistry = metadataRegistry;
+        maybeInitialize();
+    }
+
     /**
      * Call after itemRegistry and settings are specified to initialize homekit devices
      */
@@ -147,10 +154,10 @@ public class HomekitChangeListener implements ItemRegistryChangeListener {
         if (initialized) {
             return;
         }
-        if (this.itemRegistry != null && this.settings != null) {
+        if (this.itemRegistry != null && this.settings != null && this.metadataRegistry != null) {
             initialized = true;
             itemRegistry.addRegistryChangeListener(this);
-            itemRegistry.getAll().stream().map(item -> new HomekitTaggedItem(item, itemRegistry))
+            itemRegistry.getAll().stream().map(item -> new HomekitTaggedItem(item, itemRegistry, metadataRegistry))
                     .filter(taggedItem -> taggedItem.isAccessory())
                     .filter(taggedItem -> !taggedItem.isMemberOfAccessoryGroup())
                     .forEach(rootTaggedItem -> createRootAccessory(rootTaggedItem));
@@ -180,7 +187,7 @@ public class HomekitChangeListener implements ItemRegistryChangeListener {
             }
             logger.debug("Adding homekit device {}", taggedItem.getItem().getName());
             accessoryRegistry.addRootAccessory(taggedItem.getName(),
-                    HomekitAccessoryFactory.create(taggedItem, itemRegistry, updater, settings));
+                    HomekitAccessoryFactory.create(taggedItem, itemRegistry, metadataRegistry, updater, settings));
             logger.debug("Added homekit device {}", taggedItem.getItem().getName());
         } catch (Exception e) {
             logger.error("Could not add device: {}", e.getMessage(), e);

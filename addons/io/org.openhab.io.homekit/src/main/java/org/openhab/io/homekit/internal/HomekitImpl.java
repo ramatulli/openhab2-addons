@@ -18,6 +18,7 @@ import java.security.InvalidAlgorithmParameterException;
 
 import org.eclipse.smarthome.config.core.ConfigurableService;
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.eclipse.smarthome.core.storage.StorageService;
 import org.openhab.io.homekit.Homekit;
 import org.osgi.framework.Constants;
@@ -69,6 +70,15 @@ public class HomekitImpl implements Homekit {
 
     public void unsetItemRegistry(ItemRegistry itemRegistry) {
         changeListener.setItemRegistry(null);
+    }
+
+    @Reference
+    public void setMetadataRegistry(MetadataRegistry metadataRegistry) {
+        changeListener.setMetadataRegistry(metadataRegistry);
+    }
+
+    public void unsetMetadataRegistry(MetadataRegistry metadataRegistry) {
+        changeListener.setMetadataRegistry(null);
     }
 
     @Activate

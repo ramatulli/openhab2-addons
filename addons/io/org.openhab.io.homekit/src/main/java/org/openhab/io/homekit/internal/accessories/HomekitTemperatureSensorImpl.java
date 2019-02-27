@@ -15,6 +15,7 @@ package org.openhab.io.homekit.internal.accessories;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.eclipse.smarthome.core.library.items.NumberItem;
 import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.openhab.io.homekit.internal.HomekitAccessoryUpdater;
@@ -33,8 +34,8 @@ class HomekitTemperatureSensorImpl extends AbstractTemperatureHomekitAccessoryIm
         implements TemperatureSensor {
 
     public HomekitTemperatureSensorImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater, HomekitSettings settings) {
-        super(taggedItem, itemRegistry, updater, settings, NumberItem.class);
+            MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater, HomekitSettings settings) {
+        super(taggedItem, itemRegistry, metadataRegistry, updater, settings, NumberItem.class);
     }
 
     @Override

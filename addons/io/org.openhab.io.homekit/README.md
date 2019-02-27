@@ -99,6 +99,11 @@ A full list of supported accessory types can be found in the table below.
 |                       | homekit:CurrentSecuritySystemState | String                    | The current state of the security system. STAY_ARM / AWAY_ARM / NIGHT_ARM / DISARMED / TRIGGERED |
 |                       | homekit:TargetSecuritySystemState  | String                    | The requested state of the security system. STAY_ARM / AWAY_ARM / NIGHT_ARM / DISARM. While the requested state is not DISARM, and the current state is DISARMED, HomeKit will display "Arming...", for example during an exit delay. |
 
+Additionally, some items accept per-item configuration in the homekit metadata:
+
+| Tag | Metadata Key | Description |
+|-----|--------------|-------------|
+| Fan | speedsSteps  | How many steps to show in the Home app. Default 100. Steps are scaled linearly to the backing Dimmer item (i.e. with speedSteps=4, your Dimmer will receive commands at 25%, 50%, 75%, 100%). |
 
 See the sample below for example items:
 
@@ -120,7 +125,7 @@ Switch WaterMain_Valve "Water Main Valve" ["Valve"]
 Rollershutter MasterWindow_Blinds "Master Window Blinds" [ "WindowCovering" ]
 
 Dimmer FamilyRoomFan "Family Room Fan" <fan> [ "Fan" ]
-Switch BathroomFan "Bathroom Fan" <fan> [ "Fan" ]
+Switch BathroomFan "Bathroom Fan" <fan> [ "Fan" ] { homekit="Fan" [ speedSteps=3 ] }
 
 Group gAlarm "Security System" [ "SecuritySystem" ]
 String Alarm_CurrentState (gAlarm) [ "homekit:CurrentSecuritySystemState" ]

@@ -21,6 +21,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.eclipse.smarthome.core.library.items.StringItem;
 import org.eclipse.smarthome.core.library.types.StringType;
 import org.openhab.io.homekit.internal.HomekitAccessoryUpdater;
@@ -53,9 +54,9 @@ class HomekitSecuritySystemImpl extends AbstractHomekitAccessoryImpl<GroupItem> 
     private Logger logger = LoggerFactory.getLogger(HomekitSecuritySystemImpl.class);
 
     public HomekitSecuritySystemImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater, Map<HomekitCharacteristicType, Item> origCharacteristicItems)
-            throws IncompleteAccessoryException {
-        super(taggedItem, itemRegistry, updater, GroupItem.class);
+            MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater,
+            Map<HomekitCharacteristicType, Item> origCharacteristicItems) throws IncompleteAccessoryException {
+        super(taggedItem, itemRegistry, metadataRegistry, updater, GroupItem.class);
 
         HashMap<HomekitCharacteristicType, Item> characteristicItems = new HashMap<>(origCharacteristicItems);
 

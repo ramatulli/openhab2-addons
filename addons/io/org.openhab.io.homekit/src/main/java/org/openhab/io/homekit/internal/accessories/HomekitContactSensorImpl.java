@@ -15,6 +15,7 @@ package org.openhab.io.homekit.internal.accessories;
 import java.util.concurrent.CompletableFuture;
 
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.OpenClosedType;
 import org.openhab.io.homekit.internal.HomekitAccessoryUpdater;
@@ -33,8 +34,8 @@ public class HomekitContactSensorImpl extends AbstractHomekitSensorImpl implemen
     private BooleanItemReader contactSensedReader;
 
     public HomekitContactSensorImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater, BatteryStatus batteryStatus) {
-        super(taggedItem, itemRegistry, updater, batteryStatus);
+            MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater, BatteryStatus batteryStatus) {
+        super(taggedItem, itemRegistry, metadataRegistry, updater, batteryStatus);
 
         this.contactSensedReader = new BooleanItemReader(taggedItem.getItem(), OnOffType.OFF, OpenClosedType.CLOSED);
     }

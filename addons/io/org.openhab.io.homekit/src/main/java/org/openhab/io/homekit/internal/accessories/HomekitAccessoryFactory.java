@@ -19,6 +19,7 @@ import java.util.Optional;
 import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.openhab.io.homekit.internal.HomekitAccessoryType;
 import org.openhab.io.homekit.internal.HomekitAccessoryUpdater;
 import org.openhab.io.homekit.internal.HomekitCharacteristicType;
@@ -40,7 +41,8 @@ public class HomekitAccessoryFactory {
     static Logger logger = LoggerFactory.getLogger(HomekitTaggedItem.class);
 
     public static HomekitAccessory create(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater, HomekitSettings settings) throws Exception {
+            MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater, HomekitSettings settings)
+            throws Exception {
         logger.debug("Constructing {} of accessoryType {}", taggedItem.getName(), taggedItem.getAccessoryType());
 
         Map<HomekitCharacteristicType, Item> characteristicItems = getCharacteristicItems(taggedItem);
@@ -48,86 +50,87 @@ public class HomekitAccessoryFactory {
         switch (taggedItem.getAccessoryType()) {
             case LEAK_SENSOR:
                 HomekitTaggedItem leakSensorAccessory = getPrimaryAccessory(taggedItem,
-                        HomekitAccessoryType.LEAK_SENSOR, itemRegistry).orElseThrow(
+                        HomekitAccessoryType.LEAK_SENSOR, itemRegistry, metadataRegistry).orElseThrow(
                                 () -> new Exception("Leak accessory group should have a leak sensor in it"));
 
-                return new HomekitLeakSensorImpl(leakSensorAccessory, itemRegistry, updater,
+                return new HomekitLeakSensorImpl(leakSensorAccessory, itemRegistry, metadataRegistry, updater,
                         BatteryStatus.getFromCharacteristics(characteristicItems));
 
             case VALVE:
-                return new HomekitValveImpl(taggedItem, itemRegistry, updater);
+                return new HomekitValveImpl(taggedItem, itemRegistry, metadataRegistry, updater);
 
             case MOTION_SENSOR:
                 HomekitTaggedItem motionSensorAccessory = getPrimaryAccessory(taggedItem,
-                        HomekitAccessoryType.MOTION_SENSOR, itemRegistry)
+                        HomekitAccessoryType.MOTION_SENSOR, itemRegistry, metadataRegistry)
                                 .orElseThrow(() -> new Exception(
                                         "Motion sensor accessory group should have a motion sensor item in it"));
 
-                return new HomekitMotionSensorImpl(motionSensorAccessory, itemRegistry, updater,
+                return new HomekitMotionSensorImpl(motionSensorAccessory, itemRegistry, metadataRegistry, updater,
                         BatteryStatus.getFromCharacteristics(characteristicItems));
 
             case OCCUPANCY_SENSOR:
                 HomekitTaggedItem occupancySensorAccessory = getPrimaryAccessory(taggedItem,
-                        HomekitAccessoryType.OCCUPANCY_SENSOR, itemRegistry)
+                        HomekitAccessoryType.OCCUPANCY_SENSOR, itemRegistry, metadataRegistry)
                                 .orElseThrow(() -> new Exception(
                                         "Occupancy sensor accessory group should have a occupancy sensor item in it"));
 
-                return new HomekitOccupancySensorImpl(occupancySensorAccessory, itemRegistry, updater,
+                return new HomekitOccupancySensorImpl(occupancySensorAccessory, itemRegistry, metadataRegistry, updater,
                         BatteryStatus.getFromCharacteristics(characteristicItems));
 
             case CONTACT_SENSOR:
                 HomekitTaggedItem contactSensorAccessory = getPrimaryAccessory(taggedItem,
-                        HomekitAccessoryType.CONTACT_SENSOR, itemRegistry)
+                        HomekitAccessoryType.CONTACT_SENSOR, itemRegistry, metadataRegistry)
                                 .orElseThrow(() -> new Exception(
                                         "Contact sensor accessory group should have a occupancy sensor item in it"));
 
-                return new HomekitContactSensorImpl(contactSensorAccessory, itemRegistry, updater,
+                return new HomekitContactSensorImpl(contactSensorAccessory, itemRegistry, metadataRegistry, updater,
                         BatteryStatus.getFromCharacteristics(characteristicItems));
 
             case LIGHTBULB:
-                return new HomekitLightbulbImpl(taggedItem, itemRegistry, updater);
+                return new HomekitLightbulbImpl(taggedItem, itemRegistry, metadataRegistry, updater);
 
             case THERMOSTAT:
                 HomekitTaggedItem temperatureAccessory = getPrimaryAccessory(taggedItem,
-                        HomekitAccessoryType.TEMPERATURE_SENSOR, itemRegistry)
+                        HomekitAccessoryType.TEMPERATURE_SENSOR, itemRegistry, metadataRegistry)
                                 .orElseThrow(() -> new Exception("Thermostats need a CurrentTemperature accessory"));
 
-                return new HomekitThermostatImpl(taggedItem, itemRegistry, updater, settings,
+                return new HomekitThermostatImpl(taggedItem, itemRegistry, metadataRegistry, updater, settings,
                         temperatureAccessory.getItem(), getCharacteristicItems(taggedItem));
 
             case SWITCH:
-                return new HomekitSwitchImpl(taggedItem, itemRegistry, updater);
+                return new HomekitSwitchImpl(taggedItem, itemRegistry, metadataRegistry, updater);
 
             case TEMPERATURE_SENSOR:
-                return new HomekitTemperatureSensorImpl(taggedItem, itemRegistry, updater, settings);
+                return new HomekitTemperatureSensorImpl(taggedItem, itemRegistry, metadataRegistry, updater, settings);
 
             case HUMIDITY_SENSOR:
-                return new HomekitHumiditySensorImpl(taggedItem, itemRegistry, updater);
+                return new HomekitHumiditySensorImpl(taggedItem, itemRegistry, metadataRegistry, updater);
             case BLINDS:
             case WINDOW_COVERING:
-                return new HomekitWindowCoveringImpl(taggedItem, itemRegistry, updater);
+                return new HomekitWindowCoveringImpl(taggedItem, itemRegistry, metadataRegistry, updater);
             case SMOKE_SENSOR:
                 HomekitTaggedItem smokeSensorAccessory = getPrimaryAccessory(taggedItem,
-                        HomekitAccessoryType.SMOKE_SENSOR, itemRegistry).orElseThrow(
+                        HomekitAccessoryType.SMOKE_SENSOR, itemRegistry, metadataRegistry).orElseThrow(
                                 () -> new Exception("Smoke accessory group should have a smoke sensor in it"));
 
-                return new HomekitSmokeSensorImpl(smokeSensorAccessory, itemRegistry, updater,
+                return new HomekitSmokeSensorImpl(smokeSensorAccessory, itemRegistry, metadataRegistry, updater,
                         BatteryStatus.getFromCharacteristics(characteristicItems));
             case CARBON_MONOXIDE_SENSOR:
                 HomekitTaggedItem carbonMonoxideSensorAccessory = getPrimaryAccessory(taggedItem,
-                        HomekitAccessoryType.CARBON_MONOXIDE_SENSOR, itemRegistry)
+                        HomekitAccessoryType.CARBON_MONOXIDE_SENSOR, itemRegistry, metadataRegistry)
                                 .orElseThrow(() -> new Exception(
                                         "Carbon monoxide accessory group should have a carbon monoxide sensor in it"));
 
-                return new HomekitSmokeSensorImpl(carbonMonoxideSensorAccessory, itemRegistry, updater,
-                        BatteryStatus.getFromCharacteristics(characteristicItems));
+                return new HomekitSmokeSensorImpl(carbonMonoxideSensorAccessory, itemRegistry, metadataRegistry,
+                        updater, BatteryStatus.getFromCharacteristics(characteristicItems));
             case FAN:
-                HomekitTaggedItem fanAccessory = getPrimaryAccessory(taggedItem, HomekitAccessoryType.FAN, itemRegistry)
-                        .orElseThrow(() -> new Exception("Fan accessory group should have a fan in it"));
+                HomekitTaggedItem fanAccessory = getPrimaryAccessory(taggedItem, HomekitAccessoryType.FAN, itemRegistry,
+                        metadataRegistry)
+                                .orElseThrow(() -> new Exception("Fan accessory group should have a fan in it"));
 
-                return new HomekitFanImpl(fanAccessory, itemRegistry, updater);
+                return new HomekitFanImpl(fanAccessory, itemRegistry, metadataRegistry, updater);
             case SECURITY_SYSTEM:
-                return new HomekitSecuritySystemImpl(taggedItem, itemRegistry, updater,
+                return new HomekitSecuritySystemImpl(taggedItem, itemRegistry, metadataRegistry, updater,
                         getCharacteristicItems(taggedItem));
         }
 
@@ -142,11 +145,11 @@ public class HomekitAccessoryFactory {
      * @return
      */
     private static Optional<HomekitTaggedItem> getPrimaryAccessory(HomekitTaggedItem taggedItem,
-            HomekitAccessoryType accessoryType, ItemRegistry itemRegistry) {
+            HomekitAccessoryType accessoryType, ItemRegistry itemRegistry, MetadataRegistry metadataRegistry) {
         if (taggedItem.isGroup()) {
             GroupItem groupItem = (GroupItem) taggedItem.getItem();
             return groupItem.getMembers().stream().filter(item -> item.hasTag(accessoryType.getTag())).findFirst()
-                    .map(item -> new HomekitTaggedItem(item, itemRegistry));
+                    .map(item -> new HomekitTaggedItem(item, itemRegistry, metadataRegistry));
         } else if (taggedItem.getAccessoryType() == accessoryType) {
             return Optional.of(taggedItem);
         } else {

@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.smarthome.core.items.GenericItem;
 import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.eclipse.smarthome.core.library.items.DimmerItem;
 import org.eclipse.smarthome.core.library.items.SwitchItem;
 import org.eclipse.smarthome.core.library.types.OnOffType;
@@ -37,9 +38,22 @@ import com.beowulfe.hap.accessories.characteristics.RotationSpeed;
  * @author Cody Cutrer - Initial contribution
  */
 class HomekitFanImpl extends AbstractHomekitAccessoryImpl<GenericItem> implements Fan {
+    private int fanSpeeds;
 
-    public HomekitFanImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry, HomekitAccessoryUpdater updater) {
-        super(taggedItem, itemRegistry, updater, GenericItem.class);
+    public HomekitFanImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry, MetadataRegistry metadataRegistry,
+            HomekitAccessoryUpdater updater) {
+        super(taggedItem, itemRegistry, metadataRegistry, updater, GenericItem.class);
+        Object fanSpeedMetadata = getMetadataSetting("speedSteps");
+        if (fanSpeedMetadata instanceof Number) {
+            this.fanSpeeds = ((Number) fanSpeedMetadata).intValue();
+        } else {
+            this.fanSpeeds = 100;
+        }
+    }
+
+    @Override
+    public int getNumberOfSpeeds() {
+        return fanSpeeds;
     }
 
     @Override
@@ -74,7 +88,7 @@ class HomekitFanImpl extends AbstractHomekitAccessoryImpl<GenericItem> implement
         State state = getItem().getStateAs(PercentType.class);
         if (state instanceof PercentType) {
             PercentType speed = (PercentType) state;
-            return CompletableFuture.completedFuture(speed.intValue());
+            return CompletableFuture.completedFuture((int) (speed.doubleValue() * fanSpeeds / 100.0d));
         } else {
             return CompletableFuture.completedFuture(null);
         }
@@ -83,10 +97,11 @@ class HomekitFanImpl extends AbstractHomekitAccessoryImpl<GenericItem> implement
     @Override
     public CompletableFuture<Void> setRotationSpeed(Integer value) throws Exception {
         GenericItem item = getItem();
+        int scaledValue = 100 * value / fanSpeeds;
         if (item instanceof DimmerItem) {
-            ((DimmerItem) item).send(new PercentType(value));
+            ((DimmerItem) item).send(new PercentType(scaledValue));
         } else if (item instanceof GroupItem) {
-            ((GroupItem) item).send(new PercentType(value));
+            ((GroupItem) item).send(new PercentType(scaledValue));
         }
         return CompletableFuture.completedFuture(null);
     }

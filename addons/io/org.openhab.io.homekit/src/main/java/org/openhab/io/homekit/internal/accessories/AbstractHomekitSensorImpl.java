@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.items.GenericItem;
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.openhab.io.homekit.internal.HomekitAccessoryUpdater;
 import org.openhab.io.homekit.internal.HomekitTaggedItem;
 import org.openhab.io.homekit.internal.battery.BatteryStatus;
@@ -37,8 +38,8 @@ public abstract class AbstractHomekitSensorImpl extends AbstractHomekitAccessory
     private BatteryStatus batteryStatus;
 
     public AbstractHomekitSensorImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater, BatteryStatus batteryStatus) {
-        super(taggedItem, itemRegistry, updater, GenericItem.class);
+            MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater, BatteryStatus batteryStatus) {
+        super(taggedItem, itemRegistry, metadataRegistry, updater, GenericItem.class);
         this.batteryStatus = batteryStatus;
     }
 

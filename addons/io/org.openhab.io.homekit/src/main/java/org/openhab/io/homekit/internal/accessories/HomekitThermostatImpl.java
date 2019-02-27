@@ -22,6 +22,7 @@ import org.eclipse.jdt.annotation.NonNull;
 import org.eclipse.smarthome.core.items.GroupItem;
 import org.eclipse.smarthome.core.items.Item;
 import org.eclipse.smarthome.core.items.ItemRegistry;
+import org.eclipse.smarthome.core.items.MetadataRegistry;
 import org.eclipse.smarthome.core.library.items.NumberItem;
 import org.eclipse.smarthome.core.library.items.StringItem;
 import org.eclipse.smarthome.core.library.types.DecimalType;
@@ -67,9 +68,10 @@ class HomekitThermostatImpl extends AbstractTemperatureHomekitAccessoryImpl<Grou
     private Logger logger = LoggerFactory.getLogger(HomekitThermostatImpl.class);
 
     public HomekitThermostatImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
-            HomekitAccessoryUpdater updater, HomekitSettings settings, Item currentTemperatureItem,
-            Map<HomekitCharacteristicType, Item> origCharacteristicItems) throws IncompleteAccessoryException {
-        super(taggedItem, itemRegistry, updater, settings, GroupItem.class);
+            MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater, HomekitSettings settings,
+            Item currentTemperatureItem, Map<HomekitCharacteristicType, Item> origCharacteristicItems)
+            throws IncompleteAccessoryException {
+        super(taggedItem, itemRegistry, metadataRegistry, updater, settings, GroupItem.class);
 
         HashMap<HomekitCharacteristicType, Item> characteristicItems = new HashMap<>(origCharacteristicItems);
         this.settings = settings;
