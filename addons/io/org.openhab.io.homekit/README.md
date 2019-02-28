@@ -91,7 +91,7 @@ A full list of supported accessory types can be found in the table below.
 | MotionSensor          |                                    | Switch, ContactSensor     | Motion sensor. ON / OPEN state means motion detected. |
 | OccupancySensor       |                                    | Switch, ContactSensor     | Occupancy sensor. ON / OPEN state means occupancy detected. |
 | Valve                 |                                    | Switch                    | Simple open/close valve. Assumes liquid is flowing when valve is open. |
-| WindowCovering        |                                    | Rollershutter             | Simple window covering with support for setting target position / current position support. |
+| WindowCovering        |                                    | Rollershutter, Dimmer     | Simple window covering with support for setting target position / current position support. |
 | SmokeSensor           |                                    | Switch, ContactSensor     | Smoke detector. ON / OPEN state means smokes detected. |
 | CarbonMonoxideSensor  |                                    | Switch, ContactSensor     | CO detector. ON / OPEN state means smoke detected (it currently appears that Home.app on iOS doesn't distinguish between a smoke and CO detector). |
 | Fan                   |                                    | Switch, Dimmer            | Fan with or without speed control. |
@@ -101,9 +101,10 @@ A full list of supported accessory types can be found in the table below.
 
 Additionally, some items accept per-item configuration in the homekit metadata:
 
-| Tag | Metadata Key | Description |
-|-----|--------------|-------------|
-| Fan | speedsSteps  | How many steps to show in the Home app. Default 100. Steps are scaled linearly to the backing Dimmer item (i.e. with speedSteps=4, your Dimmer will receive commands at 25%, 50%, 75%, 100%). |
+| Tag            | Metadata Key | Description |
+|----------------|--------------|-------------|
+| Fan            | speedsSteps  | How many steps to show in the Home app. Default 100. Steps are scaled linearly to the backing Dimmer item (i.e. with speedSteps=4, your Dimmer will receive commands at 25%, 50%, 75%, 100%). |
+| WindowCovering | inverted     | If the Dimmer is inverted (i.e. 100 represents open instead of closed) |
 
 See the sample below for example items:
 
@@ -123,6 +124,7 @@ Switch Bathroom_OccupancySensor "Bathroom Occupancy Sensor" [ "OccupancySensor" 
 Switch MasterBath_Toilet_LeakSensor "Master Bath Toilet Flood" ["LeakSensor"]
 Switch WaterMain_Valve "Water Main Valve" ["Valve"]
 Rollershutter MasterWindow_Blinds "Master Window Blinds" [ "WindowCovering" ]
+Dimmer FamilyWindow_Blinds "Family Room Window Blinds" [ "WindowCovering" ] { homekit="WindowCovering" [ inverted=true ] }
 
 Dimmer FamilyRoomFan "Family Room Fan" <fan> [ "Fan" ]
 Switch BathroomFan "Bathroom Fan" <fan> [ "Fan" ] { homekit="Fan" [ speedSteps=3 ] }

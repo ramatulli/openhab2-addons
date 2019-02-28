@@ -14,8 +14,10 @@ package org.openhab.io.homekit.internal.accessories;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.eclipse.smarthome.core.items.GenericItem;
 import org.eclipse.smarthome.core.items.ItemRegistry;
 import org.eclipse.smarthome.core.items.MetadataRegistry;
+import org.eclipse.smarthome.core.library.items.DimmerItem;
 import org.eclipse.smarthome.core.library.items.RollershutterItem;
 import org.eclipse.smarthome.core.library.types.PercentType;
 import org.openhab.io.homekit.internal.HomekitAccessoryUpdater;
@@ -29,12 +31,18 @@ import com.beowulfe.hap.accessories.properties.WindowCoveringPositionState;
  *
  * @author epike - Initial contribution
  */
-public class HomekitWindowCoveringImpl extends AbstractHomekitAccessoryImpl<RollershutterItem>
-        implements WindowCovering {
+public class HomekitWindowCoveringImpl extends AbstractHomekitAccessoryImpl<GenericItem> implements WindowCovering {
+    private boolean inverted;
 
     public HomekitWindowCoveringImpl(HomekitTaggedItem taggedItem, ItemRegistry itemRegistry,
             MetadataRegistry metadataRegistry, HomekitAccessoryUpdater updater) {
-        super(taggedItem, itemRegistry, metadataRegistry, updater, RollershutterItem.class);
+        super(taggedItem, itemRegistry, metadataRegistry, updater, GenericItem.class);
+        Object invertedMetadata = getMetadataSetting("inverted");
+        if (invertedMetadata instanceof Boolean) {
+            this.inverted = (Boolean) invertedMetadata;
+        } else {
+            this.inverted = false;
+        }
     }
 
     @Override
@@ -43,7 +51,11 @@ public class HomekitWindowCoveringImpl extends AbstractHomekitAccessoryImpl<Roll
         if (value == null) {
             return CompletableFuture.completedFuture(null);
         }
-        return CompletableFuture.completedFuture(100 - value.intValue());
+        int result = value.intValue();
+        if (!inverted) {
+            result = 100 - result;
+        }
+        return CompletableFuture.completedFuture(result);
     }
 
     @Override
@@ -58,7 +70,16 @@ public class HomekitWindowCoveringImpl extends AbstractHomekitAccessoryImpl<Roll
 
     @Override
     public CompletableFuture<Void> setTargetPosition(int value) throws Exception {
-        ((RollershutterItem) getItem()).send(new PercentType(100 - value));
+        int trueValue = value;
+        if (!inverted) {
+            trueValue = 100 - value;
+        }
+
+        if (getItem() instanceof RollershutterItem) {
+            ((RollershutterItem) getItem()).send(new PercentType(trueValue));
+        } else if (getItem() instanceof DimmerItem) {
+            ((DimmerItem) getItem()).send(new PercentType(trueValue));
+        }
         return CompletableFuture.completedFuture(null);
     }
 
