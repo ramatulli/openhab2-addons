@@ -17,6 +17,14 @@
 			<channel id="vaneud" typeId="VanePosition" />
 			<channel id="vanelr" typeId="VanePosition" />
 			<channel id="ambtemp" typeId="Temperature" />
+
+            <channel id="model" typeId="Model" />
+	        <channel id="mac" typeId="Mac" />
+	        <channel id="ip" typeId="Ip" />
+	        <channel id="protocol" typeId="Protocol" />
+	        <channel id="version" typeId="Version" />			
+            <channel id="rssi" typeId="Rssi" />   			
+            <channel id="name" typeId="Name" />   
 		</channels>
 
 		<config-description>
@@ -120,4 +128,54 @@
 		</tags>
 		<state readOnly="true" pattern="%.1f %unit%" />
 	</channel-type>
+	
+	<channel-type id="Model">
+        <item-type>String</item-type>
+        <label>Model</label>
+        <description>Intesis device model reference</description>
+        <state readOnly="true" />
+    </channel-type>
+	
+	<channel-type id="Mac">
+        <item-type>String</item-type>
+        <label>MAC Address</label>
+        <description>6 bytes of the MAC address</description>
+        <state readOnly="true" />
+    </channel-type>
+    
+    <channel-type id="Ip">
+        <item-type>String</item-type>
+        <label>IP Address</label>
+        <description>IP address of the IntesisBox</description>
+        <state readOnly="true" />
+    </channel-type>
+
+    <channel-type id="Protocol">
+        <item-type>String</item-type>
+        <label>Protocol</label>
+        <description>External protocol supported</description>
+        <state readOnly="true" />
+    </channel-type>    
+    
+     <channel-type id="Version">
+        <item-type>String</item-type>
+        <label>Version</label>
+        <description>Firmware version running in the device</description>
+        <state readOnly="true" />
+    </channel-type>    
+
+     <channel-type id="Rssi">
+        <item-type>String</item-type>
+        <label>WiFi RSSI</label>
+        <description>Received Signal Strength Indication for the WiFi</description>
+        <state readOnly="true" />
+    </channel-type>      
+    
+    <channel-type id="Name">
+        <item-type>String</item-type>
+        <label>Name</label>
+        <description>The hostname of the IntesisBox</description>
+        <state readOnly="true" />
+    </channel-type>  
+	
 </thing:thing-descriptions>
