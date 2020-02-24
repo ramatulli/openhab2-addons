@@ -39,4 +39,13 @@ public class IntesisBoxBindingConstants {
     public static final String VANELR = "vanelr";
     public static final String ERRSTATUS = "errstatus";
     public static final String ERRCODE = "errcode";
+
+    public static final String MODEL = "model";
+    public static final String MAC = "mac";
+    public static final String IP = "ip";
+    public static final String PROTOCOL = "protocol";
+    public static final String VERSION = "version";
+    public static final String RSSI = "rssi";
+    public static final String NAME = "name";
+
 }

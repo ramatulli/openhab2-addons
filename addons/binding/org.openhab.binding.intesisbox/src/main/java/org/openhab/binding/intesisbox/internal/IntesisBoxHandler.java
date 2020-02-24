@@ -60,6 +60,12 @@ public class IntesisBoxHandler extends BaseThingHandler {
 
     private final Logger logger = LoggerFactory.getLogger(IntesisBoxHandler.class);
 
+    private @Nullable IntesisBoxConfiguration config;
+
+    public IntesisBoxHandler(Thing thing) {
+        super(thing);
+    }
+
     private Map<String, List<String>> limits = new HashMap<String, List<String>>();
     private double minTemp = 0.0d, maxTemp = 0.0d;
     @Nullable
@@ -75,10 +81,6 @@ public class IntesisBoxHandler extends BaseThingHandler {
     private boolean connected = false;
     @Nullable
     private ScheduledFuture<?> pollingTask;
-
-    public IntesisBoxHandler(Thing thing) {
-        super(thing);
-    }
 
     @Override
     public void handleCommand(ChannelUID channelUID, Command command) {
@@ -142,19 +144,34 @@ public class IntesisBoxHandler extends BaseThingHandler {
 
     private void receivedUpdate(String function, String value) {
         logger.debug("receivedUpdate(): {} {}", function, value);
+
         ChannelUID channelUID = new ChannelUID(getThing().getUID(), function.toLowerCase());
         switch (channelUID.getId()) {
             case ONOFF:
                 updateState(channelUID, OnOffType.from(value));
                 break;
+
             case SETPTEMP:
+                // Don't update silly SETPTEMP when in FAN mode
+                if (value.equals("32768")) {
+                    break;
+                }
             case AMBTEMP:
                 updateState(channelUID, new QuantityType<Temperature>(Double.valueOf(value) / 10.0d, SIUnits.CELSIUS));
                 break;
+
             case MODE:
             case FANSP:
             case VANEUD:
             case VANELR:
+
+            case MODEL:
+            case MAC:
+            case IP:
+            case PROTOCOL:
+            case VERSION:
+            case RSSI:
+            case NAME:
                 updateState(channelUID, new StringType(value));
                 break;
         }
@@ -169,13 +186,24 @@ public class IntesisBoxHandler extends BaseThingHandler {
     }
 
     private void handleMessage(String data) {
-        if (data.equals("ACK")) {
+
+        logger.debug("handleMessage(): '{}' Message received - {}", data);
+
+        if (data.equals("ACK") || data.equals(null) || data.equals("")) {
             return;
+        }
+
+        if (data.startsWith(ID + ':')) {
+            synchronized (this) {
+                new Identity(data).value.forEach((name, value) -> receivedUpdate(name, value));
+                return;
+            }
         }
 
         Message message = Message.parse(data);
         switch (message.getCommand()) {
             case LIMITS:
+
                 synchronized (this) {
                     if (message.getFunction().toLowerCase().equals(SETPTEMP)) {
                         List<Double> limits = message.getLimitsValue().stream().map(l -> Double.valueOf(l) / 10)
@@ -193,8 +221,14 @@ public class IntesisBoxHandler extends BaseThingHandler {
             case CHN:
                 receivedUpdate(message.getFunction(), message.getValue());
                 break;
-
         }
+
+    }
+
+    private void sendAlive() {
+        String data = String.format("ID\r\nGET,1:*\r\n");
+        write(data);
+        logger.info("keep alive sent");
     }
 
     private void sendCommand(String function, String value) {
@@ -236,6 +270,7 @@ public class IntesisBoxHandler extends BaseThingHandler {
         if (!isConnected()) {
             openConnection();
         }
+        sendAlive();
     }
 
     private void openConnection() {
@@ -281,12 +316,13 @@ public class IntesisBoxHandler extends BaseThingHandler {
             logger.error("write(): Unable to write to socket: {} ", exception.getMessage(), exception);
             setConnected(false);
         }
+
     }
 
     public String read() {
         String message = "";
-
         try {
+
             message = tcpInput.readLine();
             logger.debug("read(): Message Received: {}", message);
         } catch (IOException ioException) {
@@ -305,13 +341,15 @@ public class IntesisBoxHandler extends BaseThingHandler {
         logger.debug("Start initializing!");
         IntesisBoxConfiguration config = getConfigAs(IntesisBoxConfiguration.class);
 
+        logger.info("Intesisbox configuration: " + config.toString());
+
         if (config.ipAddress != null) {
             ipAddress = config.ipAddress;
             tcpPort = config.port.intValue();
 
             updateStatus(ThingStatus.OFFLINE);
             if (pollingTask == null || pollingTask.isCancelled()) {
-                pollingTask = scheduler.scheduleWithFixedDelay(this::polling, 0, 30, TimeUnit.SECONDS);
+                pollingTask = scheduler.scheduleWithFixedDelay(this::polling, 0, 45, TimeUnit.SECONDS);
             }
         } else {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR, "No IP address specified)");
@@ -362,6 +400,7 @@ public class IntesisBoxHandler extends BaseThingHandler {
                         handleMessage(messageLine);
                     } catch (Exception e) {
                         logger.error("TCPListener(): Message not handled by thing: {}", e.getMessage());
+                        closeConnection();
                     }
                 }
             } catch (Exception e) {
