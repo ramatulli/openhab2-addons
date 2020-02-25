@@ -125,12 +125,28 @@ public class IntesisBoxHandler extends BaseThingHandler {
             case ERRSTATUS:
             case ERRCODE:
                 break;
+
+            case MODEL:
+            case MAC:
+            case IP:
+            case PROTOCOL:
+            case VERSION:
+            case RSSI:
+                return;
+
+            case NAME:
+                sendId(ID);
+                return;
+
             default:
                 logger.warn("Unknown channel {}", channelUID.getId());
                 return;
         }
 
         if (command instanceof RefreshType) {
+
+            logger.warn("Refresh channel {}", channelUID.getId());
+
             sendQuery(channelUID.getId());
             return;
         }
@@ -152,11 +168,13 @@ public class IntesisBoxHandler extends BaseThingHandler {
                 break;
 
             case SETPTEMP:
-                // Don't update silly SETPTEMP when in FAN mode
                 if (value.equals("32768")) {
-                    break;
+                    value = "0";
                 }
             case AMBTEMP:
+                if (Double.valueOf(value).isNaN()) {
+                    value = "0";
+                }
                 updateState(channelUID, new QuantityType<Temperature>(Double.valueOf(value) / 10.0d, SIUnits.CELSIUS));
                 break;
 
@@ -226,9 +244,15 @@ public class IntesisBoxHandler extends BaseThingHandler {
     }
 
     private void sendAlive() {
-        String data = String.format("ID\r\nGET,1:*\r\n");
+        String data = String.format("GET,1:%s\r\n", "*");
         write(data);
         logger.info("keep alive sent");
+    }
+
+    private void sendId(String function) {
+        String data = String.format("%s\r\n", function);
+        write(data);
+        logger.info("sendId(): '{}' Command Sent - {}", function);
     }
 
     private void sendCommand(String function, String value) {
@@ -271,6 +295,7 @@ public class IntesisBoxHandler extends BaseThingHandler {
             openConnection();
         }
         sendAlive();
+        sendId(ID);
     }
 
     private void openConnection() {
@@ -322,9 +347,8 @@ public class IntesisBoxHandler extends BaseThingHandler {
     public String read() {
         String message = "";
         try {
-
             message = tcpInput.readLine();
-            logger.debug("read(): Message Received: {}", message);
+            logger.info("read(): Message Received: {}", message);
         } catch (IOException ioException) {
             logger.error("read(): IO Exception: {}", ioException.getMessage());
             setConnected(false);
