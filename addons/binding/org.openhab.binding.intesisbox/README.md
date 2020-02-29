@@ -3,6 +3,15 @@
 This binding connects to WiFi [IntesisBox](http://www.intesisbox.com/) devices, speaking an ASCII protocol.
 It does _not_ support [IntesisHome](http://www.intesishome.com/) devices. This binding has only been tested against a FJ-RC-WMP-1 IntesisBox.
 
+[update 29-Feb-2020]
+
+Binding tested against IntesisBox model FJ-AC-WMP-1 connected to a Fujitsu AUTGxxKRLA. Some further enhancement made to the binding include
+- addition of the IntesisBox ID command which returns details about the intesisbox device itself (rather than the connected AC unit) 
+- channels MODE, FANSP, VANEUD, VANELR now dynamically set based on the LIMITS returned from the connected A/C unit. 
+
+If the channel is not supported by the A/C unit, such as VALUELR on a ceiling cassette unit, it will maintain the the default values for that channel, e.g. [AUTO, 1-9, SWING, PULSE]. Just manually unlink the channel if not used in the OpenHab thing configuration.
+
+
 ## Supported Things
 
 This binding only supports one thing type:
@@ -35,6 +44,16 @@ without discovery.
 | vanelr     | String             | Control of left/right vanes (if applicable)                           | AUTO, 1-9, SWING, PULSE |
 | errstatus  | String             | (Readonly) A description of an error coming from your climate system. | |
 | errcode    | Number             | (Readonly) An error code coming from your climate system.             | |
+| errcode    | Number             | (Readonly) An error code coming from your climate system.             | |
+| model      | String             | (Readonly) The Intesis device model reference                         | |
+| mac        | String             | (Readonly) The 6 bytes of the MAC address                             | |
+| ip         | String             | (Readonly) The IP address of the IntesisBox                           | |
+| protocol   | String             | (Readonly) The external protocol supported                            | |
+| version    | String             | (Readonly) The firmware version running in the device                 | |
+| rssi       | String             | (Readonly) The received Signal Strength Indication for the Wi-Fi      | |
+| name       | String             | (Readonly) The host name of the IntesisBox                            | |
+
+
 
 Note that individual A/C units may not support all channels, or all possible values for those channels.
 For example, not all A/C units have controllable vanes. Or fan speed may be limited to 1-4, instead of all of 1-9.
