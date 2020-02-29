@@ -44,14 +44,13 @@ without discovery.
 | vanelr     | String             | Control of left/right vanes (if applicable)                           | AUTO, 1-9, SWING, PULSE |
 | errstatus  | String             | (Readonly) A description of an error coming from your climate system. | |
 | errcode    | Number             | (Readonly) An error code coming from your climate system.             | |
-| errcode    | Number             | (Readonly) An error code coming from your climate system.             | |
-| model      | String             | (Readonly) The Intesis device model reference                         | |
-| mac        | String             | (Readonly) The 6 bytes of the MAC address                             | |
-| ip         | String             | (Readonly) The IP address of the IntesisBox                           | |
-| protocol   | String             | (Readonly) The external protocol supported                            | |
-| version    | String             | (Readonly) The firmware version running in the device                 | |
-| rssi       | String             | (Readonly) The received Signal Strength Indication for the Wi-Fi      | |
-| name       | String             | (Readonly) The host name of the IntesisBox                            | |
+| model      | String             | (Readonly) The Intesis device model reference                         | FJ-AC-WMP-1|
+| mac        | String             | (Readonly) The 6 bytes of the MAC address                             | CC3F1D01EAB9|
+| ip         | String             | (Readonly) The IP address of the IntesisBox                           | 192.168.1.100|
+| protocol   | String             | (Readonly) The external protocol supported                            | ASCII|
+| version    | String             | (Readonly) The firmware version running in the device                 | v1.3.3|
+| rssi       | String             | (Readonly) The received Signal Strength Indication for the Wi-Fi      | -55|
+| name       | String             | (Readonly) The host name of the IntesisBox                            | WMP_01EAB9|
 
 
 
