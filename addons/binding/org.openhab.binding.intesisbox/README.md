@@ -9,7 +9,7 @@ Binding tested against IntesisBox model FJ-AC-WMP-1 connected to a Fujitsu AUTGx
 - addition of the IntesisBox ID command which returns details about the intesisbox device itself (rather than the connected AC unit) 
 - channels MODE, FANSP, VANEUD, VANELR now dynamically set based on the LIMITS returned from the connected A/C unit. 
 
-If the channel is not supported by the A/C unit, such as VALUELR on a ceiling cassette unit, it will maintain the the default values for that channel, e.g. [AUTO, 1-9, SWING, PULSE]. Just manually unlink the channel if not used in the OpenHab thing configuration.
+If the channel is not supported by the A/C unit, such as VALUELR on a ceiling cassette unit, it will maintain the default values for that channel, e.g. [AUTO, 1-9, SWING, PULSE]. Just manually unlink the channel if not used in the OpenHab thing configuration.
 
 
 ## Supported Things
