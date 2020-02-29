@@ -25,18 +25,21 @@ import org.eclipse.smarthome.core.thing.binding.BaseThingHandlerFactory;
 import org.eclipse.smarthome.core.thing.binding.ThingHandler;
 import org.eclipse.smarthome.core.thing.binding.ThingHandlerFactory;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
 
 /**
  * The {@link IntesisBoxHandlerFactory} is responsible for creating things and thing
  * handlers.
  *
  * @author Cody Cutrer - Initial contribution
+ * @author Rocky Amatulli - Added stateDescriptionProvider
  */
 @NonNullByDefault
 @Component(configurationPid = "binding.intesisbox", service = ThingHandlerFactory.class)
 public class IntesisBoxHandlerFactory extends BaseThingHandlerFactory {
 
     private static final Set<ThingTypeUID> SUPPORTED_THING_TYPES_UIDS = Collections.singleton(THING_TYPE_INTESISBOX);
+    private IntesisBoxStateDescriptionProvider stateDescriptionProvider = new IntesisBoxStateDescriptionProvider();
 
     @Override
     public boolean supportsThingType(ThingTypeUID thingTypeUID) {
@@ -48,9 +51,19 @@ public class IntesisBoxHandlerFactory extends BaseThingHandlerFactory {
         ThingTypeUID thingTypeUID = thing.getThingTypeUID();
 
         if (THING_TYPE_INTESISBOX.equals(thingTypeUID)) {
-            return new IntesisBoxHandler(thing);
+            return new IntesisBoxHandler(thing, stateDescriptionProvider);
         }
 
         return null;
     }
+
+    @Reference
+    protected void setDynamicStateDescriptionProvider(IntesisBoxStateDescriptionProvider stateDescriptionProvider) {
+        this.stateDescriptionProvider = stateDescriptionProvider;
+    }
+
+    protected void unsetDynamicStateDescriptionProvider(IntesisBoxStateDescriptionProvider stateDescriptionProvider) {
+        this.stateDescriptionProvider.deactivate();
+    }
+
 }

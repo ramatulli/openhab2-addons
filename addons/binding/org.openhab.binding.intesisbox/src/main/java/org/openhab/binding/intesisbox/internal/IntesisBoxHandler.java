@@ -24,6 +24,7 @@ import java.net.Socket;
 import java.net.SocketAddress;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,7 @@ import org.eclipse.smarthome.core.thing.ThingStatusDetail;
 import org.eclipse.smarthome.core.thing.binding.BaseThingHandler;
 import org.eclipse.smarthome.core.types.Command;
 import org.eclipse.smarthome.core.types.RefreshType;
+import org.eclipse.smarthome.core.types.StateOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +56,8 @@ import org.slf4j.LoggerFactory;
  * sent to one of the channels.
  *
  * @author Cody Cutrer - Initial contribution
+ * @author Rocky Amatulli - additions to include id message handling, dynamic channel options based on limits.
+ *
  */
 @NonNullByDefault
 public class IntesisBoxHandler extends BaseThingHandler {
@@ -61,9 +65,11 @@ public class IntesisBoxHandler extends BaseThingHandler {
     private final Logger logger = LoggerFactory.getLogger(IntesisBoxHandler.class);
 
     private @Nullable IntesisBoxConfiguration config;
+    private IntesisBoxStateDescriptionProvider stateDescriptionProvider = new IntesisBoxStateDescriptionProvider();
 
-    public IntesisBoxHandler(Thing thing) {
+    public IntesisBoxHandler(Thing thing, IntesisBoxStateDescriptionProvider stateDescriptionProvider) {
         super(thing);
+        this.stateDescriptionProvider = stateDescriptionProvider;
     }
 
     private Map<String, List<String>> limits = new HashMap<String, List<String>>();
@@ -182,7 +188,6 @@ public class IntesisBoxHandler extends BaseThingHandler {
             case FANSP:
             case VANEUD:
             case VANELR:
-
             case MODEL:
             case MAC:
             case IP:
@@ -223,7 +228,8 @@ public class IntesisBoxHandler extends BaseThingHandler {
             case LIMITS:
 
                 synchronized (this) {
-                    if (message.getFunction().toLowerCase().equals(SETPTEMP)) {
+                    String channelId = message.getFunction().toLowerCase();
+                    if (channelId.equals(SETPTEMP)) {
                         List<Double> limits = message.getLimitsValue().stream().map(l -> Double.valueOf(l) / 10)
                                 .collect(Collectors.toList());
                         if (limits.size() == 2) {
@@ -232,7 +238,14 @@ public class IntesisBoxHandler extends BaseThingHandler {
                         }
 
                     } else {
-                        limits.put(message.getFunction().toLowerCase(), message.getLimitsValue());
+                        limits.put(channelId, message.getLimitsValue());
+                        switch (channelId) {
+                            case MODE:
+                            case FANSP:
+                            case VANEUD:
+                            case VANELR:
+                                updateChannelStateDescription(channelId);
+                        }
                     }
                 }
                 break;
@@ -241,6 +254,21 @@ public class IntesisBoxHandler extends BaseThingHandler {
                 break;
         }
 
+    }
+
+    private void updateChannelStateDescription(String channelId) {
+
+        // if (isLinked(channelId)) {
+        if (limits.containsKey(channelId)) {
+            List<StateOption> options = new ArrayList<>();
+            for (String mode : limits.get(channelId)) {
+                options.add(
+                        new StateOption(mode, (mode.substring(0, 1).toUpperCase() + mode.substring(1).toLowerCase())));
+            }
+            stateDescriptionProvider.setStateOptions(new ChannelUID(getThing().getUID(), channelId), options);
+        }
+
+        // }
     }
 
     private void sendAlive() {
@@ -373,7 +401,7 @@ public class IntesisBoxHandler extends BaseThingHandler {
 
             updateStatus(ThingStatus.OFFLINE);
             if (pollingTask == null || pollingTask.isCancelled()) {
-                pollingTask = scheduler.scheduleWithFixedDelay(this::polling, 0, 45, TimeUnit.SECONDS);
+                pollingTask = scheduler.scheduleWithFixedDelay(this::polling, 3, 45, TimeUnit.SECONDS);
             }
         } else {
             updateStatus(ThingStatus.OFFLINE, ThingStatusDetail.CONFIGURATION_ERROR, "No IP address specified)");
@@ -433,4 +461,5 @@ public class IntesisBoxHandler extends BaseThingHandler {
             }
         }
     }
+
 }
