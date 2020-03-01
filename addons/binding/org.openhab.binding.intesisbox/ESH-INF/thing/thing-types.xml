@@ -17,7 +17,7 @@
 			<channel id="vaneud" typeId="VanePosition" />
 			<channel id="vanelr" typeId="VanePosition" />
 			<channel id="ambtemp" typeId="Temperature" />
-
+						
             <channel id="model" typeId="Model" />
 	        <channel id="mac" typeId="Mac" />
 	        <channel id="ip" typeId="Ip" />
@@ -25,6 +25,9 @@
 	        <channel id="version" typeId="Version" />			
             <channel id="rssi" typeId="Rssi" />   			
             <channel id="name" typeId="Name" />   
+          
+            <channel id="errstatus" typeId="ErrStatus" /> 
+            <channel id="errcode" typeId="ErrCode" />                         
 		</channels>
 
 		<config-description>
@@ -178,4 +181,18 @@
         <state readOnly="true" />
     </channel-type>  
 	
+	<channel-type id="ErrStatus">
+        <item-type>String</item-type>
+        <label>Error Status</label>
+        <description>OK or ERR when any error occurs</description>
+        <state readOnly="true" />
+    </channel-type>
+
+    <channel-type id="ErrCode">
+        <item-type>Number</item-type>
+        <label>Error Code</label>
+        <description>The error code reported by the device</description>
+        <state readOnly="true" />
+    </channel-type>    
+    
 </thing:thing-descriptions>
