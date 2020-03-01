@@ -65,13 +65,13 @@ are ignored.
 
 The binding can be fully setup from the Paper UI but if you decide to use files here is a full example:
 
-Things
+**Things**
 
 ```intesisbox.things
 Thing intesisbox:intesisbox:WMP_0001 "AC Unit Adapter" @ "AC" [ipAddress="192.168.1.100", port=3310]
 ```
 
-Items
+**Items**
 
 ```intesisbox.items
 Switch ac               "Power"                                         { channel="intesisbox:intesisbox:WMP_0001:onoff" }
@@ -97,7 +97,7 @@ Number acErrorCode      "Error Code"                                    { channe
 String blank            ""
 ```
 
-Sitemap
+**Sitemap**
 
 
 ```intesisbox.sitemap
