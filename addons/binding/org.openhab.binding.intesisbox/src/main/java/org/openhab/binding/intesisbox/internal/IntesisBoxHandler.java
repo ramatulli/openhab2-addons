@@ -36,6 +36,7 @@ import javax.measure.quantity.Temperature;
 
 import org.eclipse.jdt.annotation.NonNullByDefault;
 import org.eclipse.jdt.annotation.Nullable;
+import org.eclipse.smarthome.core.library.types.DecimalType;
 import org.eclipse.smarthome.core.library.types.OnOffType;
 import org.eclipse.smarthome.core.library.types.QuantityType;
 import org.eclipse.smarthome.core.library.types.StringType;
@@ -137,10 +138,10 @@ public class IntesisBoxHandler extends BaseThingHandler {
             case IP:
             case PROTOCOL:
             case VERSION:
-            case RSSI:
+            case NAME:
                 return;
 
-            case NAME:
+            case RSSI:
                 sendId(ID);
                 return;
 
@@ -150,9 +151,7 @@ public class IntesisBoxHandler extends BaseThingHandler {
         }
 
         if (command instanceof RefreshType) {
-
             logger.warn("Refresh channel {}", channelUID.getId());
-
             sendQuery(channelUID.getId());
             return;
         }
@@ -165,7 +164,7 @@ public class IntesisBoxHandler extends BaseThingHandler {
     }
 
     private void receivedUpdate(String function, String value) {
-        logger.debug("receivedUpdate(): {} {}", function, value);
+        logger.trace("receivedUpdate(): {} {}", function, value);
 
         ChannelUID channelUID = new ChannelUID(getThing().getUID(), function.toLowerCase());
         switch (channelUID.getId()) {
@@ -184,10 +183,15 @@ public class IntesisBoxHandler extends BaseThingHandler {
                 updateState(channelUID, new QuantityType<Temperature>(Double.valueOf(value) / 10.0d, SIUnits.CELSIUS));
                 break;
 
+            case ERRCODE:
+                updateState(channelUID, new DecimalType(Double.valueOf(value)));
+                break;
+
             case MODE:
             case FANSP:
             case VANEUD:
             case VANELR:
+            case ERRSTATUS:
             case MODEL:
             case MAC:
             case IP:
@@ -248,6 +252,7 @@ public class IntesisBoxHandler extends BaseThingHandler {
                         }
                     }
                 }
+                logger.info("{}", data);
                 break;
             case CHN:
                 receivedUpdate(message.getFunction(), message.getValue());
@@ -267,7 +272,6 @@ public class IntesisBoxHandler extends BaseThingHandler {
             }
             stateDescriptionProvider.setStateOptions(new ChannelUID(getThing().getUID(), channelId), options);
         }
-
         // }
     }
 
@@ -280,7 +284,7 @@ public class IntesisBoxHandler extends BaseThingHandler {
     private void sendId(String function) {
         String data = String.format("%s\r\n", function);
         write(data);
-        logger.info("sendId(): '{}' Command Sent - {}", function);
+        logger.debug("sendId(): '{}' Command Sent", function);
     }
 
     private void sendCommand(String function, String value) {
@@ -376,7 +380,7 @@ public class IntesisBoxHandler extends BaseThingHandler {
         String message = "";
         try {
             message = tcpInput.readLine();
-            logger.info("read(): Message Received: {}", message);
+            logger.debug("read(): Message Received: {}", message);
         } catch (IOException ioException) {
             logger.error("read(): IO Exception: {}", ioException.getMessage());
             setConnected(false);
@@ -392,8 +396,6 @@ public class IntesisBoxHandler extends BaseThingHandler {
     public void initialize() {
         logger.debug("Start initializing!");
         IntesisBoxConfiguration config = getConfigAs(IntesisBoxConfiguration.class);
-
-        logger.info("Intesisbox configuration: " + config.toString());
 
         if (config.ipAddress != null) {
             ipAddress = config.ipAddress;
