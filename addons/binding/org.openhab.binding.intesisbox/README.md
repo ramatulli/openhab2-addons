@@ -9,7 +9,7 @@ Binding tested against IntesisBox model FJ-AC-WMP-1 connected to a Fujitsu AUTGx
 - addition of the IntesisBox ID command which returns details about the intesisbox device itself (rather than the connected AC unit) 
 - channels MODE, FANSP, VANEUD, VANELR now dynamically set based on the LIMITS returned from the connected A/C unit. 
 
-If the channel is not supported by the A/C unit, such as VALUELR on a ceiling cassette unit, it will maintain the default values for that channel, e.g. [AUTO, 1-9, SWING, PULSE]. Just manually unlink the channel if not used in the OpenHab thing configuration.
+If the channel is not supported by the A/C unit, such as VALUELR on a ceiling cassette unit, it will maintain the the default values for that channel, e.g. [AUTO, 1-9, SWING, PULSE]. Just manually unlink the channel if not used in the OpenHab thing configuration.
 
 
 ## Supported Things
@@ -63,11 +63,79 @@ are ignored.
 
 ## Full Example
 
-```intesis.items
-Group gLoftThermostat "Loft Minisplit" [ "Thermostat" ]
+The binding can be fully setup from the Paper UI but if you decide to use files here is a full example:
 
-Switch LoftMinisplit_Switch "Power" { channel="intesisbox:intesisbox:001dc9835e29:onoff" }
-String LoftMinisplit_Mode "Mode" { channel="intesisbox:intesisbox:001dc9835e29:mode" }
-Number:Temperature LoftMinisplit_SetPoint "Set Point" (gLoftThermostat) [ "TargetTemperature" ] { channel="intesisbox:intesisbox:001dc9835e29:setptemp" }
-Number:Temperature LoftMinisplit_AmbTemp "Ambient Temperature" (gLoftThermostat) [ "CurrentTemperature" ] { channel="intesisbox:intesisbox:001dc9835e29:ambtemp" }
+Things
+
+```intesisbox.things
+Thing intesisbox:intesisbox:WMP_0001 "AC Unit Adapter" @ "AC" [ipAddress="192.168.1.100", port=3310]
 ```
+
+Items
+
+```intesisbox.items
+Switch ac               "Power"                                         { channel="intesisbox:intesisbox:WMP_0001:onoff" }
+String acMode           "Mode"                                          { channel="intesisbox:intesisbox:WMP_0001:mode" }
+Number acSetPoint       "Set Temperature [%.1f °C]" <heating>           { channel="intesisbox:intesisbox:WMP_0001:setptemp" }
+Number acAmbientTemp    "Current Temperature [%.1f °C]" <temperature>   { channel="intesisbox:intesisbox:WMP_0001:ambtemp" }
+String acFanSpeed       "Fan Speed" <fan>                               { channel="intesisbox:intesisbox:WMP_0001:fansp" }
+
+String acVanesUpDown    "Vanes U/D Position"                            { channel="intesisbox:intesisbox:WMP_0001:vaneud" }
+String acVanesLeftRight "Vanes L/R Position"                            { channel="intesisbox:intesisbox:WMP_0001:vanelr" }
+
+String acModel          "Model"                                         { channel="intesisbox:intesisbox:WMP_0001:model" }
+String acMac            "MAC Address"                                   { channel="intesisbox:intesisbox:WMP_0001:mac" }
+String acIp             "IP Address"                                    { channel="intesisbox:intesisbox:WMP_0001:ip" }
+String acProtocol       "Protocol"                                      { channel="intesisbox:intesisbox:WMP_0001:protocol" }
+String acVersion        "FW Version"                                    { channel="intesisbox:intesisbox:WMP_0001:version" }
+String acRssi           "WiFi RSSI"                                     { channel="intesisbox:intesisbox:WMP_0001:rssi" }
+String acName           "Host Name"                                     { channel="intesisbox:intesisbox:WMP_0001:name" }
+
+String acErrorStatus    "Error Status"                                  { channel="intesisbox:intesisbox:WMP_0001:errstatus" }
+Number acErrorCode      "Error Code"                                    { channel="intesisbox:intesisbox:WMP_0001:errcode" }
+
+String blank            ""
+```
+
+Sitemap
+
+
+```intesisbox.sitemap
+sitemap intesisbox label="My Home Automation Testing" {
+
+    Frame item=acModel label="Fujitsu A/C via IntesisBox" {
+        Text item=blank icon=""
+    }
+
+    Frame label="Controller" {
+
+        Switch item=ac
+
+        Selection item=acMode icon="settings" valuecolor=["COOL"="aqua", "HEAT"="red", "AUTO"="orange"]
+        Setpoint item=acSetPoint minValue=18 maxValue=30 step=0.5 icon="heating" valuecolor=[>=26="orange", <=21="aqua"]
+        Text item=acAmbientTemp icon="temperature"
+        Selection item=acFanSpeed 
+        Text item=blank icon=""
+
+        Selection item=acVanesUpDown
+        Selection item=acVanesLeftRight visibility=[acVanesLeftRight!="SWING"]
+    }
+
+    Frame label="Diagnostic" {
+
+        Text item=acModel
+        Text item=acMac
+        Text item=acIp
+        Text item=acProtocol
+        Text item=acVersion
+        Text item=acRssi
+        Text item=acName 
+        Text item=blank icon=""
+        Text item=acErrorStatus valuecolor=["OK"="green", "ERR"="red"]
+        Text item=acErrorCode valuecolor=[0="green", >=1="red"]
+
+    }
+}
+```
+
+
